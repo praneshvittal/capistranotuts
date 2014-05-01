@@ -1,0 +1,1209 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"con",
+				"content_providers	statement"
+			],
+			[
+				"ass",
+				"assert_equal"
+			],
+			[
+				"old",
+				"old_inventory"
+			],
+			[
+				"un",
+				"unchangedCount"
+			],
+			[
+				"unc",
+				"unchanged_count"
+			],
+			[
+				"ol",
+				"old_inventory"
+			],
+			[
+				"new",
+				"new_inventory"
+			],
+			[
+				"unch",
+				"unchangedCount"
+			],
+			[
+				"old_o",
+				"old_inventory"
+			],
+			[
+				"spl",
+				"split_time"
+			],
+			[
+				"date",
+				"datetime	import"
+			],
+			[
+				"st",
+				"start_of_json_until_broadcaster	statement"
+			],
+			[
+				"star",
+				"start_of_json_until_broadcaster"
+			],
+			[
+				"sta",
+				"start_of_json	statement"
+			],
+			[
+				"bo",
+				"body_tag_upto_time	statement"
+			],
+			[
+				"ope",
+				"opening_tag_upto_broadcaster	statement"
+			],
+			[
+				"cont",
+				"contents	statement"
+			],
+			[
+				"cone",
+				"contents	statement"
+			],
+			[
+				"content",
+				"contents	statement"
+			],
+			[
+				"it",
+				"iteritems	function"
+			],
+			[
+				"conten",
+				"content_providers	statement"
+			],
+			[
+				"K",
+				"KeyError	class"
+			],
+			[
+				"conte",
+				"contents	statement"
+			],
+			[
+				"pos",
+				"posts"
+			],
+			[
+				"stre",
+				"stream_start	statement"
+			],
+			[
+				"i",
+				"iteritems	function"
+			],
+			[
+				"read",
+				"readline	function"
+			],
+			[
+				"file",
+				"filename	statement"
+			],
+			[
+				"l",
+				"last_name"
+			],
+			[
+				"di",
+				"divide"
+			],
+			[
+				"pri",
+				"printB"
+			],
+			[
+				"pr",
+				"printC"
+			],
+			[
+				"print",
+				"printC"
+			],
+			[
+				"ur",
+				"urgency"
+			],
+			[
+				"rad",
+				"radio"
+			],
+			[
+				"font",
+				"font-family"
+			],
+			[
+				"ca",
+				"categories"
+			],
+			[
+				"categ",
+				"category"
+			],
+			[
+				"cat",
+				"category"
+			],
+			[
+				"app",
+				"app_path"
+			],
+			[
+				"des",
+				"description"
+			],
+			[
+				"bot",
+				"bootstrap3_enabled"
+			],
+			[
+				"Boo",
+				"Book"
+			],
+			[
+				"Book",
+				"BooksController"
+			],
+			[
+				"for",
+				"foreach	foreach …"
+			],
+			[
+				"lon",
+				"longestAlphabeticalOrderedString	function"
+			],
+			[
+				"long",
+				"longestString	statement"
+			],
+			[
+				"s",
+				"start	statement"
+			],
+			[
+				"lng",
+				"longString	statement"
+			],
+			[
+				"lo",
+				"longestString	statement"
+			],
+			[
+				"nex",
+				"next_char	statement"
+			],
+			[
+				"v",
+				"vowels	statement"
+			],
+			[
+				"Game",
+				"GamesController"
+			],
+			[
+				"ra",
+				"raw_input	function"
+			],
+			[
+				"wor",
+				"words_arr"
+			],
+			[
+				"rand",
+				"random_words"
+			],
+			[
+				"num",
+				"num_words_needed"
+			],
+			[
+				"wr",
+				"words_count"
+			],
+			[
+				"tem",
+				"template	import"
+			],
+			[
+				"f",
+				"filter	function"
+			],
+			[
+				"vale",
+				"value	statement"
+			],
+			[
+				"age",
+				"age_in_minutes	statement"
+			],
+			[
+				"utc",
+				"utcnow	function"
+			],
+			[
+				"rend",
+				"render_to_response	import"
+			],
+			[
+				"ren",
+				"render_to_response	function"
+			],
+			[
+				"dat",
+				"datetime	class"
+			],
+			[
+				"class",
+				"classtools	import"
+			],
+			[
+				"su",
+				"subTest	class"
+			],
+			[
+				"A",
+				"AttrDisplay	class"
+			],
+			[
+				"play",
+				"playerNo"
+			],
+			[
+				"count",
+				"countP"
+			],
+			[
+				"cre",
+				"created_at"
+			],
+			[
+				"__",
+				"__unicode__"
+			],
+			[
+				"sho",
+				"shoppingCart2	function"
+			],
+			[
+				"la",
+				"languages	statement"
+			],
+			[
+				"lowe",
+				"lower_case_title	function"
+			],
+			[
+				"Sto",
+				"StoryAdmin	class"
+			],
+			[
+				"Date",
+				"DateTimeField	class"
+			],
+			[
+				"co",
+				"contrib	import"
+			],
+			[
+				"url",
+				"urlparse	import"
+			],
+			[
+				"property",
+				"property	class"
+			],
+			[
+				"key",
+				"keywords"
+			],
+			[
+				"sea",
+				"search_values"
+			],
+			[
+				"keywor",
+				"Keyword"
+			],
+			[
+				"ticket",
+				"ticket_created"
+			],
+			[
+				"back",
+				"background-color"
+			],
+			[
+				"ref",
+				"refNumber"
+			],
+			[
+				"che",
+				"checkpoint_date"
+			],
+			[
+				"ch",
+				"checkpoint_date"
+			],
+			[
+				"strto",
+				"strtotime"
+			],
+			[
+				"_",
+				"_GET"
+			],
+			[
+				"ce",
+				"checked"
+			],
+			[
+				"req",
+				"requestMethod"
+			],
+			[
+				"t",
+				"ticket_record"
+			],
+			[
+				"tick",
+				"ticket"
+			],
+			[
+				"produ",
+				"product_name"
+			],
+			[
+				"prod",
+				"product"
+			],
+			[
+				"uni",
+				"unique_product_list"
+			],
+			[
+				"pro",
+				"products"
+			],
+			[
+				"uniq",
+				"unique_products_list"
+			],
+			[
+				"use",
+				"username"
+			],
+			[
+				"in",
+				"input	Tag"
+			],
+			[
+				"get",
+				"group-tickets"
+			],
+			[
+				"mc",
+				"mciGroup"
+			],
+			[
+				"bci",
+				"bciGroup"
+			],
+			[
+				"valida",
+				"validate_radio_buttons"
+			],
+			[
+				"Raise",
+				"Raised_by_CA"
+			],
+			[
+				"problem",
+				"problem_ticket"
+			],
+			[
+				"pb",
+				"problemTkt"
+			],
+			[
+				"iss",
+				"isset"
+			],
+			[
+				"c",
+				"checked"
+			],
+			[
+				"def",
+				"default_button"
+			],
+			[
+				"radi",
+				"radio_buttons"
+			],
+			[
+				"selec",
+				"selected"
+			],
+			[
+				"erro",
+				"errors"
+			],
+			[
+				"es",
+				"escalate"
+			],
+			[
+				"wo",
+				"workaround"
+			],
+			[
+				"user",
+				"user_group"
+			],
+			[
+				"escala",
+				"escalate_to_CA"
+			],
+			[
+				"issue",
+				"issue_ident_date"
+			],
+			[
+				"cu",
+				"customer_exp"
+			],
+			[
+				"master",
+				"masterTkt"
+			],
+			[
+				"probl",
+				"problemTkt"
+			],
+			[
+				"proble",
+				"problemTkt"
+			],
+			[
+				"p",
+				"problemTkt"
+			],
+			[
+				"rec",
+				"record_exists"
+			],
+			[
+				"ti",
+				"ticket_exists"
+			],
+			[
+				"mas",
+				"masterTkt"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "config/deploy.rb",
+			"settings":
+			{
+				"buffer_size": 1438,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "lib/capistrano/tasks/access_check.cap",
+			"settings":
+			{
+				"buffer_size": 281,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "config/deploy/staging.rb",
+			"settings":
+			{
+				"buffer_size": 1554,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "lib/capistrano/tasks/nginx_status.cap",
+			"settings":
+			{
+				"buffer_size": 161,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"Snippet: ",
+				"Snippet: comment"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"About"
+			],
+			[
+				"sy",
+				"Set Syntax: SQL"
+			],
+			[
+				"sql",
+				"Set Syntax: SQL"
+			],
+			[
+				"Snippet: HT",
+				"Snippet: html-html5kel"
+			]
+		],
+		"width": 530.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/Haani/lab/cap3/config/deploy/staging.rb",
+		"/Users/Haani/lab/vagrant-getting-started/Gemfile",
+		"/Users/Haani/lab/vagrant-getting-started/2.0.0-p0",
+		"/Users/Haani/lab/vagrant-getting-started/Vagrantfile",
+		"/Users/Haani/Desktop/scripts/ruby_scripts/learningruby/scripting-with-ruby/code/inventory/snapshots/differences-version-",
+		"/Users/Haani/Desktop/scripts/ruby_scripts/learningruby/.gitignore",
+		"/Users/Haani/Desktop/scripts/ruby_scripts/learningruby/scripting-with-ruby/code/inventory/differences.rb",
+		"/Users/Haani/Desktop/scripts/python_scripts/csv2json/sample.txt",
+		"/Users/Haani/.bash_profile",
+		"/Users/Haani/Desktop/scripts/python_scripts/csv2json/a-rd4.csv",
+		"/Users/Haani/Desktop/myFirstApp/python_scripts/csv2json/csv2json.py",
+		"/tmp/subl stdin hwB30m.txt",
+		"/Users/Haani/Desktop/myFirstApp/python_scripts/csv2json/.git/config",
+		"/Users/Haani/Desktop/myFirstApp/python_scripts/build_json/readcsv.py",
+		"/Applications/MAMP/htdocs/justreadsomething/app/views/books/edit.blade.php",
+		"/Applications/MAMP/htdocs/sandbox/myphpunit/test.php",
+		"/Applications/MAMP/htdocs/sandbox/test.php",
+		"/Applications/MAMP/htdocs/justreadsomething/bootstrap/start.php",
+		"/Applications/MAMP/htdocs/justreadsomething/app/models/Book.php",
+		"/Applications/MAMP/htdocs/justreadsomething/app/views/books/show.blade.php",
+		"/Users/Haani/.gitconfig",
+		"/Applications/MAMP/htdocs/justreadsomething/.gitconfig",
+		"/Applications/MAMP/htdocs/justreadsomething/bootstrap/paths.php",
+		"/Applications/MAMP/htdocs/justreadsomething/app/config/database.php",
+		"/Applications/MAMP/htdocs/justreadsomething/app/database/migrations/2014_03_18_041914_create_books.php",
+		"/Applications/MAMP/htdocs/justreadsomething/app/routes.php",
+		"/Applications/MAMP/htdocs/justreadsomething/.htaccess",
+		"/Applications/MAMP/htdocs/justreadsomething/app/controllers/BooksController.php",
+		"/Applications/MAMP/htdocs/justreadsomething/app/controllers/BookController.php",
+		"/Applications/MAMP/htdocs/justreadsomething/.gitignore",
+		"/Applications/MAMP/htdocs/laravel-games/app/views/layout.blade.php",
+		"/Applications/MAMP/htdocs/laravel-games/app/config/database.php",
+		"/Applications/MAMP/htdocs/laravel-games/app/routes.php",
+		"/Applications/MAMP/htdocs/laravel-games/app/controllers/UsersController.php",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/vowels.py",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/iterPower.py",
+		"/Applications/MAMP/htdocs/writesomething/word_generator/word_gen.php",
+		"/Volumes/PENDRIVE/PHP Artisan/XAMPP/htdocs/learning-laravel/app/views/birthday.blade.php",
+		"/Volumes/PENDRIVE/PHP Artisan/XAMPP/htdocs/laravel-template/app/views/hello.blade.php",
+		"/Applications/MAMP/htdocs/laravel-games/app/controllers/HomeController.php",
+		"/Applications/MAMP/htdocs/laravel-games/app/models/Game.php",
+		"/Applications/MAMP/htdocs/laravel-games/app/database/migrations/2014_02_15_232124_create_games.php",
+		"/Applications/MAMP/htdocs/laravel-games/app/controllers/GamesController.php",
+		"/Applications/MAMP/htdocs/learning-laravel/app/config/database.php",
+		"/Applications/MAMP/htdocs/laravel-games/bootstrap/start.php",
+		"/Applications/MAMP/htdocs/writesomething/word_generator/layout.php",
+		"/Applications/MAMP/htdocs/writesomething/word_gen.php",
+		"/Applications/MAMP/htdocs/sandbox/Blog_noModel/functions.php",
+		"/Applications/MAMP/htdocs/sandbox/utility-Class/classes/html.php",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/OOP/person.py",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/odbchelper.py",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/apihelper.py",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/OOP/classtools.py",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/lists.py",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/OOP/__init__.py",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/OOP/manager.py",
+		"/Applications/MAMP/htdocs/writesomething/harshen-jquery-countdownTimer-b6f140e/DEMO/index.html",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/person.py",
+		"/Users/Haani/Desktop/myFirstWebApp/scripts/if.py",
+		"/Applications/XAMPP/xamppfiles/htdocs/learning-laravel/app/routes.php",
+		"/Applications/XAMPP/xamppfiles/htdocs/learning-laravel/app/views/hello.php",
+		"/Applications/XAMPP/xamppfiles/htdocs/learning-laravel/app/views/server_info.php",
+		"/Applications/MAMP/htdocs/learning-laravel/test.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/file_needs.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/search/index.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/views/search.view.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/add/index.php",
+		"/Applications/MAMP/htdocs/mipbi/search/index.php",
+		"/Applications/MAMP/htdocs/mipbi/file_needs.php",
+		"/Applications/MAMP/htdocs/mipbi/vendor/php-activerecord/php-activerecord/lib/DateTime.php",
+		"/Applications/MAMP/htdocs/mipbi/open/index.php",
+		"/Applications/MAMP/htdocs/mipbi/library/classes/Config.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/views/display.view.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/display/index.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/views/open.view.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/css/style.css",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/library/functions.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/models/database.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/open/index.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/library/classes/html.php",
+		"/Volumes/PENDRIVE/PHP Ninja/xampp/htdocs/mipbi_dev/includes/table_record.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/test/index.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/test/test.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/models/inputUtility.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/models/updates.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/models/member.php",
+		"/Applications/MAMP/htdocs/PENDRIVE/mipbi/models/ticket.php",
+		"/Applications/MAMP/htdocs/mipbi/library/classes/html.php",
+		"/Applications/MAMP/htdocs/mipbi/library/classes/dbCore.php",
+		"/Applications/MAMP/htdocs/mipbi/models/database.php",
+		"/Applications/MAMP/htdocs/mipbi/views/add.view.php",
+		"/Applications/MAMP/htdocs/mipbi/views/closed.view.php",
+		"/Applications/MAMP/htdocs/mipbi/views/my.view.php",
+		"/Applications/MAMP/htdocs/mipbi/views/open.view.php",
+		"/Applications/MAMP/htdocs/mipbi/views/search.view.php",
+		"/Applications/MAMP/htdocs/mipbi/includes/functions.php",
+		"/Applications/MAMP/htdocs/mipbi/includes/db.php",
+		"/Applications/MAMP/htdocs/mipbi/test/index.php",
+		"/Applications/MAMP/htdocs/mipbi/includes/config.php",
+		"/Applications/MAMP/htdocs/mipbi/add/index.php",
+		"/Applications/MAMP/htdocs/mipbi/includes/classes/ticket_utility.php",
+		"/Applications/MAMP/htdocs/mipbi/models/input_utility.php",
+		"/Applications/MAMP/htdocs/mipbi/library/lib_autoload.php",
+		"/Applications/MAMP/htdocs/mipbi/models/ticketUtility.php",
+		"/Applications/MAMP/htdocs/mipbi/models/inputUtility.php",
+		"/Applications/MAMP/htdocs/mipbi/closed/index.php",
+		"/Applications/MAMP/htdocs/mipbi/my/index.php",
+		"/Applications/MAMP/htdocs/mipbi/snapshot/index.php",
+		"/Applications/MAMP/htdocs/mipbi/views/snapshot.view.php",
+		"/Applications/MAMP/htdocs/mipbi/index.php",
+		"/Applications/MAMP/htdocs/mipbi/models/product.php",
+		"/Applications/MAMP/htdocs/mipbi/models/ticket.php",
+		"/Applications/MAMP/htdocs/mipbi/includes/classes/html.php",
+		"/Applications/MAMP/htdocs/mipbi/includes/classes/mipbi_ticket.php",
+		"/Applications/MAMP/htdocs/mipbi/closed_tickets/index.php",
+		"/Applications/MAMP/htdocs/mipbi/add_ticket/index.php",
+		"/Applications/MAMP/htdocs/mipbi/my_tickets/index.php",
+		"/Applications/MAMP/htdocs/mipbi/views/my_tickets.view.php",
+		"/Applications/MAMP/htdocs/mipbi/views/closed_tickets.view.php",
+		"/Applications/MAMP/htdocs/mipbi/views/add_ticket.view.php",
+		"/Applications/MAMP/htdocs/mipbi_ugly/mipbi/snapshot.php",
+		"/Applications/MAMP/htdocs/mipbi/views/open_tickets.view.php",
+		"/Applications/MAMP/htdocs/mipbi/open_tickets/index.php",
+		"/Applications/MAMP/htdocs/mipbi/includes/js/script.js",
+		"/Applications/MAMP/htdocs/mipbi/views/layout.php",
+		"/Volumes/PENDRIVE/PHP Artisan/XAMPP/htdocs/php_ajax/sql_dump",
+		"/Applications/MAMP/htdocs/sandbox/SQL-injection/injection.php",
+		"/Applications/MAMP/htdocs/mipbi_ugly/mipbi/includes/table_record.php"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			"/Applications/MAMP/htdocs/mipbi",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"net-ssh",
+			"bridged",
+			"content",
+			"author",
+			"Author",
+			"author",
+			"tags",
+			"author",
+			"description",
+			"r",
+			"c",
+			";",
+			"<P>",
+			"P",
+			"staticfiles",
+			"template_dirs",
+			"s_timer",
+			"MiPBI",
+			"mipbi",
+			"hangar25.networks.in.telstra.com.au",
+			"diff",
+			"dateToday",
+			"title-text",
+			"adjust",
+			"Ticket",
+			"class=\"topDetails\"",
+			"titleText",
+			"\"",
+			"record",
+			"data",
+			"display_records($records)",
+			"require '../includes/classes/TicketUtility.php';",
+			"MIPBI_Ticket",
+			"html",
+			"requestMethod",
+			"name",
+			"_POST",
+			"_GET",
+			"_POST",
+			"problemTkt",
+			"item",
+			"value",
+			"echo",
+			"open",
+			"chosenGroup",
+			"$(\"#mci\")",
+			"viewAll",
+			"problemTkt",
+			"pbi",
+			"problem_ticket",
+			"split_date",
+			"raised_by_CA",
+			"to-do",
+			"TO-DO",
+			"products",
+			"escalate_button",
+			"masterFieldTicket",
+			"problemFieldTicket",
+			"problemTkt",
+			"_ticketWithNoZeros",
+			"print_r",
+			"Ticket",
+			"problemFieldTicket",
+			"input",
+			"masterTicket",
+			"problemFieldTicket",
+			"problem_ticket",
+			"problem",
+			"print_prefix_list",
+			"prefix",
+			"refactored",
+			"//TO-DO:",
+			"//to-do:",
+			"displayGroupTickets",
+			"displayGroup",
+			"showAlltickets",
+			"extension",
+			"prev",
+			"first",
+			"detect_unicode",
+			"indent"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"HTML::display_records($records)",
+			"require '../includes/classes/ticket_utility.php';",
+			"TicketUtility"
+		],
+		"reverse": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "config/deploy.rb",
+					"settings":
+					{
+						"buffer_size": 1438,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								81,
+								81
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 320.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "lib/capistrano/tasks/access_check.cap",
+					"settings":
+					{
+						"buffer_size": 281,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								271,
+								271
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Rails/Ruby on Rails.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "config/deploy/staging.rb",
+					"settings":
+					{
+						"buffer_size": 1554,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								263,
+								263
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "lib/capistrano/tasks/nginx_status.cap",
+					"settings":
+					{
+						"buffer_size": 161,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								64,
+								64
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 32.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"",
+				"config/deploy/staging.rb"
+			],
+			[
+				"de",
+				"config/deploy.rb"
+			],
+			[
+				"churn.v3",
+				"code/churn/snapshots/churn.v3.rb"
+			],
+			[
+				"d",
+				"differences.rb"
+			],
+			[
+				"churn-test",
+				"code/churn/snapshots/churn-tests.v2.rb"
+			],
+			[
+				"dif",
+				"scripting-with-ruby/differences.rb"
+			],
+			[
+				"ed",
+				"app/views/books/edit.blade.php"
+			],
+			[
+				"cr",
+				"app/views/books/create.blade.php"
+			],
+			[
+				"va",
+				"app/validation.php"
+			],
+			[
+				"bo",
+				"app/controllers/BooksController.php"
+			],
+			[
+				"lay",
+				"app/views/layout.blade.php"
+			],
+			[
+				"rou",
+				"app/routes.php"
+			],
+			[
+				"cre",
+				"app/views/books/create.blade.php"
+			],
+			[
+				"all",
+				"app/views/books/all.blade.php"
+			],
+			[
+				"main",
+				"public/css/main.css"
+			],
+			[
+				"la",
+				"app/views/layout.blade.php"
+			],
+			[
+				"show",
+				"app/views/books/show.blade.php"
+			],
+			[
+				"tag",
+				"app/models/Tag.php"
+			],
+			[
+				"in",
+				"app/views/books/index.blade.php"
+			],
+			[
+				"ind",
+				"app/views/books/index.blade.php"
+			],
+			[
+				"m",
+				"public/css/main.css"
+			],
+			[
+				"i",
+				"index.php"
+			],
+			[
+				"main.",
+				"public/css/main.css"
+			],
+			[
+				"inde",
+				"app/views/books/index.blade.php"
+			],
+			[
+				"edit",
+				"app/views/books/edit.blade.php"
+			],
+			[
+				"b",
+				"app/controllers/BooksController.php"
+			],
+			[
+				"sta",
+				"bootstrap/start.php"
+			],
+			[
+				"rout",
+				"app/routes.php"
+			],
+			[
+				"r",
+				"app/routes.php"
+			],
+			[
+				"sho",
+				"app/views/books/show.blade.php"
+			],
+			[
+				"show.",
+				"app/views/books/show.blade.php"
+			],
+			[
+				"views/in",
+				"app/views/books/index.blade.php"
+			],
+			[
+				"book",
+				"app/controllers/BooksController.php"
+			],
+			[
+				"migra",
+				"app/database/migrations/2014_03_18_041914_create_books.php"
+			],
+			[
+				"views/",
+				"app/views/books/index.blade.php"
+			],
+			[
+				"bas",
+				"hackernews/templates/base.html"
+			],
+			[
+				"mas",
+				"hackernews/static/css/master.css"
+			],
+			[
+				"stori",
+				"hackernews/hackernews/stories/templatetags/stories_extras.py"
+			],
+			[
+				"base",
+				"hackernews/hackernews/templates/base.html"
+			],
+			[
+				"set",
+				"hackernews/hackernews/hackernews/settings.py"
+			],
+			[
+				"mode",
+				"hackernews/hackernews/stories/models.py"
+			],
+			[
+				"mipbi_tick",
+				"mipbi/includes/classes/mipbi_ticket.php"
+			],
+			[
+				"func",
+				"sandbox/Blog/functions.php"
+			],
+			[
+				"clos",
+				"closedTicket.php"
+			],
+			[
+				"fun",
+				"includes/functions.php"
+			],
+			[
+				"head",
+				"includes/head.php"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+			[
+				"",
+				"/Applications/MAMP/htdocs/laravel-games/games.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 119.0,
+	"status_bar_visible": true
+}
