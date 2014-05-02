@@ -6,9 +6,9 @@
 
 set :stage, 'staging'
 
-role :web, "192.168.0.12"
-role :app,  "192.168.0.12"
-role :db, "192.168.0.12", primary:true
+# role :web, "192.168.0.12"
+# role :app,  "192.168.0.12"
+# role :db, "192.168.0.12", primary:true
 #role :app, %w{deploy@example.com}
 #role :web, %w{deploy@example.com}
 #role :db,  %w{deploy@example.com}
@@ -20,7 +20,7 @@ role :db, "192.168.0.12", primary:true
 # server list. The second argument is a, or duck-types, Hash and is
 # used to set extended properties on the server.
 
-server '192.168.0.12', user: 'vagrant', roles: %w{web app}
+server '192.168.0.93', user: 'vagrant', roles: %w{web app db}
 
 
 # Custom SSH Options

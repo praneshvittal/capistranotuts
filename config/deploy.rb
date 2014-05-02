@@ -4,6 +4,8 @@ lock '3.2.1'
 set :application, 'railsdemo'
 set :repo_url, 'https://github.com/haani-niyaz/railsdemo.git'
 
+set :hello, "Hello"
+
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 

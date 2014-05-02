@@ -1,6 +1,6 @@
 namespace :status do
 
-set :message, "THIS IS A TEST MESSAGE"
+set :message, "This a test message"
 
 
 task :default do
