@@ -12,7 +12,7 @@ end
 
 namespace :notifier do 
 
-desc "print notification"
+desc "Print notification"
  task :print_notice do 
  		puts 'NOTIFICATION HERE'
  	end
