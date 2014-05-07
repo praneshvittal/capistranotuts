@@ -1,6 +1,5 @@
 Capistrano
 ==========
 
-Capistrano 3 learning resources
-
+My collection of Capistrano 3 test tasks 
 
