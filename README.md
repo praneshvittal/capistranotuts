@@ -62,30 +62,81 @@ To update Capistrano via your Gemfile do:
 
 #### What's in the config/deploy directory?  ####
 
-This where different environments are defined.
+This is where different environments are defined. You can call your environment files anything you want. This is used when you run Capistrano
+tasks on an environment such as `cap staging db:status`
 
-Here's an example of my `staging.rb` file:
+Here's an example of a `staging.rb` file:
 
-`server '192.168.0.97', roles: %w{web app db}`
+```ruby
+server '192.168.0.97', roles: %w{web app db}
+```
 
 Another method of defining roles:
 
 ```ruby
 role :web, "192.168.0.10"
 role :app,  "192.168.0.11"
-role :db, "192.168.0.12", primary:true
+role :db, "192.168.0.12"
 ```
 
-Usually you will have multiple servers defined with different roles. Here's another example for clarity:
+Usually you will have multiple servers defined with different roles(I'll explain roles soon). Here's another example for clarity:
 
-Lets assume you have defined yours servers in your `.ssh/config` file and now you can you host names.
+(Lets assume you have defined yours servers in your `.ssh/config` file and now you can use host names)
 
 ```ruby
 server 'PRODWEB', roles: %w{web}
 server 'PRODAPP', roles: %w{app}
 server 'PRODDB1', roles: %w{db postgres}
+server 'PRODDB2', roles: %w{db postgres}
+server 'PRODDB3', roles: %w{db mysql}
 server 'PRODDB4', roles: %w{db mysql}
 ```
+
+
+#### What does a 'role' mean? ####
+
+This might be obvious to some but I thought I'll give a brief explanation anyway.
+
+Looking at the previous code block you'll notice how i have multiple roles assigned:
+
+```ruby
+server 'PRODDB1', roles: %w{db postgres}   # Belongs to db & postgres role
+server 'PRODDB4', roles: %w{db mysql}      # Belongs to db & mysql role
+```
+
+Here on its best explained with an example with Capistrano command:
+
+`cap staging staging db:status`
+
+If you were to break this command down, all its doing is running the `status` task we will define in the `db` namespace (again something we define)
+
+Capistrano in a way is like pseudo code, so hopefully the code block below makes sense:
+
+```ruby
+namespace :db do 
+
+desc "Check status of DB"
+ task :status do
+ 	 on roles(:db) do |host|
+ 		#execute the command on host to get the status
+ 	 end # end loop
+ end # end task
+
+end # end namespace
+```
+
+You define the namespace. Then within the namespace we define tasks. In this case, we defined a single task called `status`. The task executes on the the `db` role. All our databases have been assigned the `db` role so it will run the task on all databases.
+We could have just as easily replaced `roles(:db)` with `roles(:postgres)` to only check the status of the postgres servers.
+
+
+So **roles** are like **groups**. You can belong to one or many groups. By that definition, **tasks** can be run on one or many groups.
+
+
+We will look at tasks in more detail next.
+
+
+
+
 
 
 
