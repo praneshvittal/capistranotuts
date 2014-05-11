@@ -52,18 +52,17 @@ To update Capistrano via your Gemfile do:
 
 #### What's a Capfile?  ####
 
-`Capfile` is the main configuration file Capistrano needs. This loaded by default.
+`Capfile` is the main configuration file Capistrano needs. This loaded by default. You'd rarely have the need to modify this.
 
 
 #### What's config/debloy.rb?   ####
 
-`config/deploy.rb` is the file that contains your Applications's default configurations. This file is geared towards Rails applications, however it can be used to to define global settings.
+`config/deploy.rb` is the file that contains your applications's default configurations. This file is geared towards Rails applications, however it can be used to to define global settings.
 
 
 #### What's in the config/deploy directory?  ####
 
-This is where different environments are defined. You can call your environment files anything you want. This is used when you run Capistrano
-tasks on an environment such as `cap staging db:status`
+This is where different environments are defined. You can call your environment files anything you want. When you run a Capistrano task you need to specify which environment you like to run it on such as `cap staging db:status`. `staging` will refer to your `config/deploy/staging.rb` file.
 
 Here's an example of a `staging.rb` file:
 
@@ -104,13 +103,13 @@ server 'PRODDB1', roles: %w{db postgres}   # Belongs to db & postgres role
 server 'PRODDB4', roles: %w{db mysql}      # Belongs to db & mysql role
 ```
 
-Here on, its best explained with Capistrano command:
+Here on, its best explained with a Capistrano command:
 
-`cap staging staging db:status`
+`cap staging db:status`
 
-If you were to break this command down, all its doing is running the `status` task we will define in the `db` namespace (again `namespace` is something we define)
+If you were to break this command down, all its doing is running the `status` task we define in the `db` namespace (again `namespace` is something we define)
 
-Capistrano in a way is like pseudo code, so hopefully the code block below makes sense:
+Capistrano in a way is like pseudo code, so the code block below should makes sense:
 
 ```ruby
 namespace :db do 
@@ -125,11 +124,10 @@ desc "Check status of DB"
 end # end namespace
 ```
 
-You define the namespace. Then within the namespace we define tasks. In this case, we defined a single task called `status`. The task executes on the the `db` role. All our databases have been assigned the `db` role so it will run the task on all databases.
-We could have just as easily replaced `roles(:db)` with `roles(:postgres)` to only check the status of the postgres servers.
+You define the **namespace** `db`. Then within the namespace we define **tasks**. In this case, we defined a single task called `status`. The task executes on servers that have been assigned the `db` role. All our databases have been assigned the `db` role so it will run the task on all databases. We could have just as easily replaced `roles(:db)` with `roles(:postgres)` to only check the status of the postgres servers.
 
 
-So **roles** are like **groups**. There can be one or many groups. By that definition, Your servers will belong to one or many groups and **tasks** are run on these groups we refer to as **roles**. 
+So **roles** are like **groups**. There can be one or many groups. Your servers will belong to one or many groups and **tasks** are run on these groups which in Capistrano speak we refer to as **roles**. 
 
 
 We will look at tasks in more detail next. 
