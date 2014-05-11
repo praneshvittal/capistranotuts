@@ -1,4 +1,4 @@
-# Capistrano  #
+# Capistrano #
 
 
 How-To notes on Capistrano 3. 
@@ -104,11 +104,11 @@ server 'PRODDB1', roles: %w{db postgres}   # Belongs to db & postgres role
 server 'PRODDB4', roles: %w{db mysql}      # Belongs to db & mysql role
 ```
 
-Here on its best explained with an example with Capistrano command:
+Here on, its best explained with Capistrano command:
 
 `cap staging staging db:status`
 
-If you were to break this command down, all its doing is running the `status` task we will define in the `db` namespace (again something we define)
+If you were to break this command down, all its doing is running the `status` task we will define in the `db` namespace (again `namespace` is something we define)
 
 Capistrano in a way is like pseudo code, so hopefully the code block below makes sense:
 
@@ -129,10 +129,16 @@ You define the namespace. Then within the namespace we define tasks. In this cas
 We could have just as easily replaced `roles(:db)` with `roles(:postgres)` to only check the status of the postgres servers.
 
 
-So **roles** are like **groups**. You can belong to one or many groups. By that definition, **tasks** can be run on one or many groups.
+So **roles** are like **groups**. There can be one or many groups. By that definition, Your servers will belong to one or many groups and **tasks** are run on these groups we refer to as **roles**. 
 
 
-We will look at tasks in more detail next.
+We will look at tasks in more detail next. 
+
+
+## Doing Something with Capistrano ##
+
+
+(coming soon!)
 
 
 
