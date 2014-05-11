@@ -523,7 +523,7 @@
 			"file": "config/deploy.rb",
 			"settings":
 			{
-				"buffer_size": 1438,
+				"buffer_size": 2016,
 				"line_ending": "Unix"
 			}
 		},
@@ -531,7 +531,7 @@
 			"file": "lib/capistrano/tasks/access_check.cap",
 			"settings":
 			{
-				"buffer_size": 281,
+				"buffer_size": 275,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,15 +539,54 @@
 			"file": "config/deploy/staging.rb",
 			"settings":
 			{
-				"buffer_size": 1554,
+				"buffer_size": 1564,
 				"line_ending": "Unix"
 			}
 		},
 		{
+			"contents": "",
 			"file": "lib/capistrano/tasks/nginx_status.cap",
+			"file_size": -1,
+			"file_write_time": -1,
 			"settings":
 			{
-				"buffer_size": 161,
+				"buffer_size": 0,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "namespace :status do\n\nset :message, \"This a test message\"  # defining a variable\n\n\ntask :default do                \n	invoke 'status:webserver'\n	invoke 'status:database'\nend\n\n\ndesc \"Check status of nginx on web server\"\n	task :webserver do\n		on roles(:web) do |host|\n		  execute \"echo '#{fetch(:message)}'\"\n			sudo 'service nginx status'\n		end\n	end\n\n\ndesc \"Check status of DB\"\n task :database do\n 	 on roles(:db) do |host|\n 		execute 'hostname'\n 		execute 'service postgresql status'\n 	 end\n end\n\n\nend\n\n\n",
+			"file": "lib/capistrano/tasks/status.rake",
+			"file_size": 464,
+			"file_write_time": 1398942646000000,
+			"settings":
+			{
+				"buffer_size": 502,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "lib/capistrano/tasks/webapp.rake",
+			"settings":
+			{
+				"buffer_size": 581,
+				"line_ending": "Unix",
+				"name": "namespace :webapp do"
+			}
+		},
+		{
+			"file": "lib/capistrano/tasks/dev.rake",
+			"settings":
+			{
+				"buffer_size": 382,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "lib/capistrano/tasks/chaining.rake",
+			"settings":
+			{
+				"buffer_size": 465,
 				"line_ending": "Unix"
 			}
 		}
@@ -848,7 +887,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -856,15 +895,15 @@
 					"file": "config/deploy.rb",
 					"settings":
 					{
-						"buffer_size": 1438,
+						"buffer_size": 2016,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								81,
-								81
+								1599,
+								1599
 							]
 						],
 						"settings":
@@ -874,7 +913,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 320.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -884,15 +923,15 @@
 					"file": "lib/capistrano/tasks/access_check.cap",
 					"settings":
 					{
-						"buffer_size": 281,
+						"buffer_size": 275,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								271,
-								271
+								36,
+								36
 							]
 						],
 						"settings":
@@ -910,15 +949,15 @@
 					"file": "config/deploy/staging.rb",
 					"settings":
 					{
-						"buffer_size": 1554,
+						"buffer_size": 1564,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								263,
-								263
+								0,
+								0
 							]
 						],
 						"settings":
@@ -936,15 +975,122 @@
 					"file": "lib/capistrano/tasks/nginx_status.cap",
 					"settings":
 					{
-						"buffer_size": 161,
+						"buffer_size": 0,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								64,
-								64
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "lib/capistrano/tasks/status.rake",
+					"settings":
+					{
+						"buffer_size": 502,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								172,
+								172
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "lib/capistrano/tasks/webapp.rake",
+					"settings":
+					{
+						"buffer_size": 581,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								464,
+								464
+							]
+						],
+						"settings":
+						{
+							"auto_name": "namespace :webapp do",
+							"syntax": "Packages/Ruby/Ruby.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "lib/capistrano/tasks/dev.rake",
+					"settings":
+					{
+						"buffer_size": 382,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								307,
+								307
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "lib/capistrano/tasks/chaining.rake",
+					"settings":
+					{
+						"buffer_size": 465,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								234,
+								234
 							]
 						],
 						"settings":
