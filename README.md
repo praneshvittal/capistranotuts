@@ -124,10 +124,10 @@ desc "Check status of DB"
 end # end namespace
 ```
 
-You define the **namespace** `db`. Then within the namespace we define **tasks**. In this case, we defined a single task called `status`. The task executes on servers that have been assigned the `db` role. All our databases have been assigned the `db` role so it will run the task on all databases. We could have just as easily replaced `roles(:db)` with `roles(:postgres)` to only check the status of the postgres servers.
+You define the **namespace** `db`. Within the namespace we define **tasks**. In this case, we defined a single task called `status`. The task executes on servers that have been assigned the `db` role. All our databases have been assigned the `db` role so it will run the task on all databases. We could have just as easily replaced `roles(:db)` with `roles(:postgres)` to only check the status of the postgres servers.
 
 
-So **roles** are like **groups**. There can be one or many groups. Your servers will belong to one or many groups and **tasks** are run on these groups which in Capistrano speak we refer to as **roles**. 
+If it's still not hitting the spot, think of **roles** as **groups**. Your servers will belong to one or many groups and **tasks** are run on these groups.
 
 
 We will look at tasks in more detail next. 
