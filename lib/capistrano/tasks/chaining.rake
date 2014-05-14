@@ -14,7 +14,7 @@ namespace :notifier do
 
 desc "Print notification"
  task :print_notice do 
- 		puts 'NOTIFICATION HERE'
+ 		puts 'All went well'
  	end
 
 end

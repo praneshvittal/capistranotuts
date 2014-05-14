@@ -589,6 +589,14 @@
 				"buffer_size": 465,
 				"line_ending": "Unix"
 			}
+		},
+		{
+			"file": "README.md",
+			"settings":
+			{
+				"buffer_size": 3778,
+				"line_ending": "Unix"
+			}
 		}
 	],
 	"build_system": "",
@@ -786,6 +794,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"`",
+			"`server 'PRODWEB', roles: %w{web}`\n`server 'PRODAPP', roles: %w{app}`\n`server 'PRODDB1', roles: %w{db postgres}`\n`server 'PRODDB4', roles: %w{db mysql}`",
 			"net-ssh",
 			"bridged",
 			"content",
@@ -887,7 +897,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 8,
 			"sheets":
 			[
 				{
@@ -930,8 +940,8 @@
 						"selection":
 						[
 							[
-								36,
-								36
+								275,
+								275
 							]
 						],
 						"settings":
@@ -956,8 +966,8 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								363,
+								266
 							]
 						],
 						"settings":
@@ -965,7 +975,7 @@
 							"syntax": "Packages/Ruby/Ruby.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1008,8 +1018,8 @@
 						"selection":
 						[
 							[
-								172,
-								172
+								11,
+								17
 							]
 						],
 						"settings":
@@ -1102,6 +1112,32 @@
 						"zoom_level": 1.0
 					},
 					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "README.md",
+					"settings":
+					{
+						"buffer_size": 3778,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3669,
+								3669
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1621.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
 				}
 			]
 		}
@@ -1148,8 +1184,12 @@
 		"selected_items":
 		[
 			[
+				"read",
+				"README.md"
+			],
+			[
 				"",
-				"config/deploy/staging.rb"
+				"README.md"
 			],
 			[
 				"de",

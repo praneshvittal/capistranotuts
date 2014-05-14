@@ -19,7 +19,9 @@ set :deploy_to, '/home/vagrant/railsdemo'
 # set :format, :pretty
 
 # Default value for :log_level is :debug
-# set :log_level, :debug
+set :log_level, :info
+
+
 
 # Default value for :pty is false
 # set :pty, true

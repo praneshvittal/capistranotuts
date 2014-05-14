@@ -3,7 +3,7 @@ namespace :dev do
 	desc "Execute test script on server"
 	 task :run_script do 
 	 	on roles(:web) do |host|
-	 	  	'/home/vagrant/test.sh'
+	 	  	'/home/vagrant/test.sh' 
 	 end
 	end
 
@@ -14,9 +14,10 @@ namespace :dev do
 		end
 	end
 
-	desc "Print globally set variable"
+	desc "Asks for name and prints it out"
 		task :hello do
-			puts "#{:hello}"
+			ask(:user, "What is your name?")
+			puts fetch(:hello) + ' ' + fetch(:user) # :hello defined in config/deploy/deploy.rb
 		end
 
 end
