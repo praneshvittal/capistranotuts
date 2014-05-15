@@ -1,17 +1,23 @@
-# Status: work in progress
+#TO-DO LIST:
+# need to update status/stop/start to reflect tomcat
+# need to update status/stop/start to reflect varnish
+# need to update path of tomcat
+# need to restart tomcat servers
+# roles need to be updated
 
 namespace :webapp do
 
 set :datestamp,  Time.now.strftime("%Y-%m-%d")
 
 
-# need to update status/stop/start to reflect tomcat
+# TO-DO: need to update status/stop/start to reflect tomcat
 
 desc "Check tomcat status and restart if not running"
 task :tomcat_check do
 	on roles(:app), in: :sequence do |host|
 		if test("sudo service nginx status")
-			puts "status up on #{host.hostname}"
+			hostname = capture('hostname')
+			puts "Tomcat : running on #{hostname}"
 		else
 			puts 'Service is not running. Attempting to restart..'
 			execute "sudo service nginx stop" 
@@ -26,13 +32,14 @@ task :tomcat_check do
 end
 
 
-# need to update status/stop/start to reflect varnish
+# TO-DO: need to update status/stop/start to reflect varnish
 
 desc "Check varnish status and restart if not running"
 task :varnish_check do
 	on roles(:app), in: :sequence do |host|
 		if test("sudo service nginx status")
-			puts "status up on #{host.hostname}"
+			hostname = capture('hostname')
+			puts "Varnish: running on #{hostname}"
 		else
 			puts 'Service is not running. Attempting to restart..'
 			execute "sudo service nginx stop" 
@@ -52,10 +59,11 @@ task :download do
 	on roles(:app), in: :sequence do |host|
 	args = ['URL', 'UN', 'PW']
   args_empty?(args)
-  puts 'Donwloading app..'
+  puts 'Downloading app..'
   warfile = get_warfile_from ENV['URL']
-  if test("ls ~/#{warfile}")
-   puts "warfile name: #{warfile}"
+  capture "cd /var/tmp && wget --user=#{ENV['UN']} --password=#{ENV['PW']} #{ENV['URL']} -O /var/tmp/#{warfile}"
+  if test("ls /var/tmp/#{warfile}")
+   puts "Dowloaded #{warfile} successfuly"
   else
    puts "Cannot find #{warfile} in home dir. Aborting.."
    exit 
@@ -63,7 +71,7 @@ task :download do
  end
 end
 
-# need to update path of tomcat
+# TO-DO: need to update path of tomcat
 
  desc "Backup current release"
 	task :backup do
@@ -81,6 +89,8 @@ end
 	end #end-taks
 
 
+# TO-DO: need to update path of tomcat
+
 desc "Deploy webapp"
 	task :deploy do
  		on roles(:app), in: :sequence do |host|
@@ -91,13 +101,18 @@ desc "Deploy webapp"
  		end
 
 
+# TO-DO: need to restart tomcat servers
 
 desc "Restart application"
 task :restart do
 	on roles(:app), in: :sequence do |host|
-   puts "Restarting app servers"
-   execute "sudo service nginx stop"   # dummy servers
- 	 execute "sudo service nginx start"  # dummy servers
+   puts "Restarting app servers.."
+   execute "sudo service nginx stop"   # dummy servers 
+ 	 if test("sudo service nginx start")  # dummy servers
+    puts 'Application restart was successful'
+   else
+   	puts 'Application restart failed'
+   end
   end
 end
 
@@ -124,7 +139,12 @@ desc "Rollback to previous release"
 
 end # webapp end
 
+
+# webapp:deploy workflow #
+
 before 'webapp:download', 'webapp:tomcat_check'
+before 'webapp:download', 'webapp:varnish_check'
+
 before 'webapp:deploy', 'webapp:download'
 before 'webapp:deploy', 'webapp:backup'
 after 'webapp:deploy', 'webapp:restart'
