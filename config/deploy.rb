@@ -18,8 +18,16 @@ set :deploy_to, '/home/vagrant/railsdemo'
 # Default value for :format is :pretty
 # set :format, :pretty
 
-# Default value for :log_level is :debug
-set :log_level, :info
+# Default value for :log_level is :debug, fa
+set :log_level, :ERROR
+
+
+#     TRACE = -1
+#     DEBUG = 0
+#     INFO  = 1
+#     WARN  = 2
+#     ERROR = 3
+#     FATAL = 4
 
 
 

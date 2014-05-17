@@ -10,8 +10,8 @@ end
 
 
 
-desc "Check status of nginx on web server"
-	task :webserver do
+desc "Check status of nginx"
+	task :nginx do
 		on roles(:web) do |host|
 		  execute "echo #{fetch(:message)}"
 			
@@ -37,6 +37,24 @@ desc "Check status of DB"
  		execute 'service postgresql status'
  	 end
  end
+
+
+def get_apache_status
+	execute "sudo service httpd status"
+end
+
+
+
+
+desc "Check status of apache"
+ task :apache do
+ 	 on roles(:web), in: :sequence do |host|
+ 		execute 'hostname'
+ 		get_apache_status
+ 		
+ 	 end
+ end
+
 
 
 end
