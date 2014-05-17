@@ -7,20 +7,41 @@
 
 namespace :webapp do
 
+# Global variables
+
 set :datestamp,  Time.now.strftime("%Y-%m-%d")
+$checkmark =  "\u2713"
+$cross     =  "\u2718"
+$warning   =  "\u26A0"
+
+desc "Check varnish status and restart if not running"
+task :varnish_check do
+	puts '== VARNISH CHECK =='.rjust(25)
+	on roles(:web), in: :sequence do |host|
+		hostname = capture('hostname')
+		if test("sudo service httpd status") 
+			puts "#{$checkmark} Varnish: running on #{hostname}"
+		else
+			puts "+ Service is not running on #{hostname}. Attempting to restart.."
+			restart_varnish_on hostname
+		end
+	end
+	puts "\n"
+end
+
+
 
 
 # TO-DO: need to update status/stop/start to reflect tomcat
 
-
-
 desc "Check tomcat status and restart if not running"
 task :tomcat_check do
+
 	puts '== TOMCAT CHECK =='.rjust(25)
 	on roles(:web), in: :sequence do |host|
 		hostname = capture('hostname')
 		if test("sudo service httpd status") 
-			puts "/ Tomcat: running on #{hostname}"
+			puts "#{$checkmark} Tomcat: running on #{hostname}"
 		else
 			puts "+ Service is not running on #{hostname}. Attempting to restart.."
 			restart_tomcat_on hostname
@@ -29,29 +50,6 @@ task :tomcat_check do
 	puts "\n"
 end
 
-
-# TO-DO: need to update status/stop/start to reflect varnish
-
-desc "Check varnish status and restart if not running"
-task :varnish_check do
-	puts '== VARNISH CHECK =='.rjust(25)
-	on roles(:web), in: :sequence do |host|
-		if test("sudo service nginx status")
-			hostname = capture('hostname')
-			puts "Varnish: running on #{hostname}"
-		else
-			puts 'Service is not running. Attempting to restart..'
-			execute "sudo service nginx stop" 
-			if test("sudo service nginx start") != 0
-				puts "Service was successfully restarted"
-			else
-				puts "Attempt to restart failed with non-zero exit status. Aborting.."
-				exit
-			end
-		end
-	end
-	puts "\n"
-end
 
 
 
@@ -63,12 +61,12 @@ task :download do
   args_empty?(args)
   warfile = get_warfile_name_from ENV['URL']
   if test("ls /var/tmp/#{warfile}")
-  	puts '! File already exists'
+  	puts "#{$warning} File already exists"
   	ask :input, "Download file again? [y/n]"
   	if 'yY'.include? fetch(:input)
  		 download warfile
   	else
-  		puts '/ Using existing file - Nothing to do.'
+  		puts "#{$checkmark} Using existing file - Nothing to do."
   	end
   else
 	  download warfile

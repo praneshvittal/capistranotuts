@@ -4,7 +4,7 @@ def args_empty? args
 	count = 0
 	args.each do |key|
 		if ENV[key].nil?
-			puts "Missing argument: #{key}"
+			puts "#{$warning} Missing argument: #{key}"
 			count = count + 1
 		else
 			if ENV[key] == ''
@@ -26,12 +26,12 @@ end
 
 
 def download warfile
-	 puts 'Downloading app..(May take a while depending on the file size)'
+	 puts '+ Downloading app..(May take a while depending on the file size)'
 	capture "cd /var/tmp && wget --user=#{ENV['UN']} --password=#{ENV['PW']} #{ENV['URL']} -O /var/tmp/#{warfile}"
 	if test("ls /var/tmp/#{warfile}")
-	   puts "Dowloaded #{warfile} successfuly"
+	   puts "#{$checkmark} Dowloaded #{warfile} successfuly"
 	 else
-	   puts "Cannot find #{warfile} in home dir. Aborting.."
+	   puts "#{$cross} Cannot find #{warfile} in home dir. Aborting.."
 	   exit 
 	 end
 end
@@ -41,14 +41,36 @@ end
 def restart_tomcat_on hostname 
 	execute "sudo service httpd stop" 
 	if test("sudo service httpd start")
-		puts "/ Tomcat: running on  #{hostname}"
+		puts "#{$checkmark} Tomcat: running on  #{hostname}"
+	else
+		# showing failure
+		error = capture "sudo service httpd start", raise_on_non_zero_exit: false # setting exit to false to stop script from terminating
+		display error
+		puts "#{$cross} Restart failed on #{hostname} with non-zero exit status. Aborting.."
+		exit
+	end
+end
+
+
+def restart_varnish_on hostname 
+	execute "sudo service httpd stop" 
+	if test("sudo service httpd start")
+		puts "#{$checkmark} Varnish: running on  #{hostname}"
 	else
 		# showing failure
 		error = capture "sudo service httpd start", raise_on_non_zero_exit: false # setting exit to false to stop script from terminating
 		puts error
-		puts "- Restart failed on #{hostname} with non-zero exit status. Aborting.."
+		puts "#{$cross} Restart failed on #{hostname} with non-zero exit status. Aborting.."
 		exit
 	end
+end
+
+
+def display error
+puts 'MESSAGE:'
+puts error
+puts 'END'
+puts "\n"
 end
 
 
