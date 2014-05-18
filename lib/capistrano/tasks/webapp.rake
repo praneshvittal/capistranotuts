@@ -18,12 +18,10 @@ desc "Check varnish status and restart if not running"
 task :varnish_check do
 	puts '== VARNISH CHECK =='.rjust(25)
 	on roles(:web), in: :sequence do |host|
-		hostname = capture('hostname')
 		if test("sudo service httpd status") 
-			puts "#{$checkmark} Varnish: running on #{hostname}"
+			puts "#{$checkmark} Varnish: running on #{get_hostname}"
 		else
-			puts "+ Service is not running on #{hostname}. Attempting to restart.."
-			restart_varnish_on hostname
+			restart_varnish_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
 		end
 	end
 	puts "\n"
@@ -39,12 +37,10 @@ task :tomcat_check do
 
 	puts '== TOMCAT CHECK =='.rjust(25)
 	on roles(:web), in: :sequence do |host|
-		hostname = capture('hostname')
 		if test("sudo service httpd status") 
-			puts "#{$checkmark} Tomcat: running on #{hostname}"
+			puts "#{$checkmark} Tomcat: running on #{get_hostname}"
 		else
-			puts "+ Service is not running on #{hostname}. Attempting to restart.."
-			restart_tomcat_on hostname
+			restart_tomcat_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
 		end
 	end
 	puts "\n"
@@ -56,56 +52,86 @@ end
 desc "Download Webapp war file"
 task :download do
 	puts '== DOWNLOAD APP =='.rjust(25)
-	on roles(:app), in: :sequence do |host|
 	args = ['URL', 'UN', 'PW', 'TCR']
   args_empty?(args)
-  warfile = get_warfile_name_from ENV['URL']
-  if test("ls /var/tmp/#{warfile}")
-  	puts "#{$warning} File already exists"
+  warfile_name = get_warfile_name_from ENV['URL']
+
+	on roles(:app, :web), in: :sequence do |host|
+  if test("ls /var/tmp/#{warfile_name}")
+  	puts "#{$warning} File already exists on #{get_hostname}"
   	ask :input, "Download file again? [y/n]"
   	if 'yY'.include? fetch(:input)
- 		 download warfile
+ 		 download_warfile_from get_hostname, warfile_name
   	else
   		puts "#{$checkmark} Using existing file - Nothing to do."
   	end
   else
-	  download warfile
+	  download_warfile_from get_hostname, warfile_name
 	end # end-test
+	puts "\n"
  end
+ puts "\n"
 end
+
+
 
 # TO-DO: need to update path of tomcat
 
  desc "Backup current release"
 	task :backup do
-		on roles(:app), in: :sequence do |host|
-		# 	if test("[ ! -f /var/tmp/backup/#{fetch(:datestamp)}/ROOT.war ]")
-		# 		puts 'Backing up files..'
-		# 		execute "mkdir -p /var/tmp/backup/#{fetch(:datestamp)}"
-		# 		execute "sudo mv /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /var/tmp/backup/#{fetch(:datestamp)}"
-		# 		puts 'Back up successful'
-		# 	else
-		# 	  puts "Backup war file already exists for #{fetch(:datestamp)}"
-		# 	end # end-if
-		# end # end-roles
+		puts '== BACKUP CURRENT =='.rjust(25)
+		on roles(:app, :web), in: :sequence do |host|
 
-		# if backup path doesn't exist, create it /mnt/backup
-		# create backup directory with date_tcr
-		# cp ../webapps/ROOT* to /mnt/backup/date_tcr
+		puts "Starting backup process on #{get_hostname}.."
 
+		# if backup path doesn't exist, create it: /mnt/backup
+		if test("[ ! -d /mnt/backup ]")
+			puts "+ Creating backup point /mnt/backup"
+			execute "sudo mkdir /mnt/backup"
+			puts "#{$checkmark} Created /mnt/backup"
 		end
-	end #end-taks
+
+		# create backup directory with date_tcr#
+		if test("[ ! -d /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']} ]")
+			puts "+ Creating backup dir /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}"
+			execute "sudo mkdir /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}"
+		end
+
+		# cp current release to backup folder
+		puts "+ Backing up files.."
+		if test( "sudo cp /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}/")
+			puts "#{$checkmark} Backup successful"
+		else
+			error = capture "sudo cp /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}/"
+			display error
+			puts "#{$cross} Backup failed..Aborting"
+			exit
+		end
+		puts "\n"
+	 end
+	 puts "\n"
+	end #end-task
 
 
 # TO-DO: need to update path of tomcat
 
 desc "Deploy webapp"
 	task :deploy do
- 		on roles(:app), in: :sequence do |host|
- 			puts 'Deploying files..'
- 			 execute "sudo cp ~/#{get_warfile_name_from ENV['URL']} /opt/test-apache-tomcat-7.0.42/webapps/ROOT.war"
- 		   puts 'Deployment successful'	
- 		  end
+		puts '== DEPLOY APP =='.rjust(25)
+ 		on roles(:app, :web), in: :sequence do |host|
+ 			puts "Deploying files on #{get_hostname}.."
+ 			 if test("sudo cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/test-apache-tomcat-7.0.42/webapps/ROOT.war")	
+ 		  	puts "#{$checkmark} Deployment successful"
+ 		  	restart_tomcat_on get_hostname, "Attempting to restart Tomcat.."
+ 		 	else
+ 		 		error = capture "sudo mv /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/test-apache-tomcat-7.0.42/webapps/ROOT.war"
+				display error
+				puts "#{$cross} Backup failed..Aborting"
+				exit
+			end
+			puts "\n"
+ 		 end
+ 		 puts "\n"
  		end
 
 
@@ -152,9 +178,9 @@ end # webapp end
 
 before 'webapp:download', 'webapp:varnish_check'
 before 'webapp:download', 'webapp:tomcat_check'
-
+after  'webapp:download', 'webapp:backup' 
 
 before 'webapp:deploy', 'webapp:download'
 before 'webapp:deploy', 'webapp:backup'
-after 'webapp:deploy', 'webapp:restart'
-after 'webapp:deploy', 'webapp:cleanup'
+# after 'webapp:deploy', 'webapp:restart'
+# after 'webapp:deploy', 'webapp:cleanup'

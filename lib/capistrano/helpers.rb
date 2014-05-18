@@ -25,20 +25,21 @@ def get_warfile_name_from url
 end
 
 
-def download warfile
-	 puts '+ Downloading app..(May take a while depending on the file size)'
-	capture "cd /var/tmp && wget --user=#{ENV['UN']} --password=#{ENV['PW']} #{ENV['URL']} -O /var/tmp/#{warfile}"
-	if test("ls /var/tmp/#{warfile}")
-	   puts "#{$checkmark} Dowloaded #{warfile} successfuly"
+def download_warfile_from hostname, warfile_name
+	puts '+ Downloading app..(May take a while depending on the file size)'
+	execute "cd /var/tmp && wget --user=#{ENV['UN']} --password=#{ENV['PW']} #{ENV['URL']} -O /var/tmp/#{warfile_name}"
+	if test("ls /var/tmp/#{warfile_name}")
+	   puts "#{$checkmark} Downloaded #{warfile_name} on #{hostname}"
 	 else
-	   puts "#{$cross} Cannot find #{warfile} in home dir. Aborting.."
+	   puts "#{$cross} Cannot find #{warfile_name} in home dir. Aborting.."
 	   exit 
 	 end
 end
 
 
 
-def restart_tomcat_on hostname 
+def restart_tomcat_on hostname, message
+  puts message 
 	execute "sudo service httpd stop" 
 	if test("sudo service httpd start")
 		puts "#{$checkmark} Tomcat: running on  #{hostname}"
@@ -73,6 +74,10 @@ puts 'END'
 puts "\n"
 end
 
+
+def get_hostname
+	capture('hostname')
+end
 
 
 
