@@ -10,18 +10,19 @@ namespace :webapp do
 # Global variables
 
 set :datestamp,  Time.now.strftime("%Y-%m-%d")
-$checkmark =  "\u2713"
+$checkmark =  "\u2714"
 $cross     =  "\u2718"
 $warning   =  "\u26A0"
+$lines     =  "\u2630"
 
 desc "Check varnish status and restart if not running"
 task :varnish_check do
-	puts '== VARNISH CHECK =='.rjust(25)
+	make_task_title_pretty "VARNISH CHECK"
 	on roles(:web), in: :sequence do |host|
 		if test("sudo service httpd status") 
 			puts "#{$checkmark} Varnish: running on #{get_hostname}"
 		else
-			restart_varnish_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
+			restart_varnish_on get_hostname , "+ Service is not running on #{get_hostname}. Attempting to restart.."
 		end
 	end
 	puts "\n"
@@ -34,8 +35,7 @@ end
 
 desc "Check tomcat status and restart if not running"
 task :tomcat_check do
-
-	puts '== TOMCAT CHECK =='.rjust(25)
+	make_task_title_pretty "TOMCAT CHECK"
 	on roles(:web), in: :sequence do |host|
 		if test("sudo service httpd status") 
 			puts "#{$checkmark} Tomcat: running on #{get_hostname}"
@@ -51,7 +51,7 @@ end
 
 desc "Download Webapp war file"
 task :download do
-	puts '== DOWNLOAD APP =='.rjust(25)
+	make_task_title_pretty "DOWNLOAD APP"
 	args = ['URL', 'UN', 'PW', 'TCR']
   args_empty?(args)
   warfile_name = get_warfile_name_from ENV['URL']
@@ -77,9 +77,9 @@ end
 
 # TO-DO: need to update path of tomcat
 
- desc "Backup current release"
+ desc "Backup current release (dependant on webapp:download)"
 	task :backup do
-		puts '== BACKUP CURRENT =='.rjust(25)
+		make_task_title_pretty "BACKUP CURRENT RELEASE"
 		on roles(:app, :web), in: :sequence do |host|
 
 		puts "Starting backup process on #{get_hostname}.."
@@ -99,10 +99,10 @@ end
 
 		# cp current release to backup folder
 		puts "+ Backing up files.."
-		if test( "sudo cp /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}/")
+		if test( "sudo cp -r /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}/")
 			puts "#{$checkmark} Backup successful"
 		else
-			error = capture "sudo cp /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}/"
+			error = capture "sudo cp -r /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}/"
 			display error
 			puts "#{$cross} Backup failed..Aborting"
 			exit
@@ -117,9 +117,9 @@ end
 
 desc "Deploy webapp"
 	task :deploy do
-		puts '== DEPLOY APP =='.rjust(25)
+		make_task_title_pretty "DEPLOY APP"
  		on roles(:app, :web), in: :sequence do |host|
- 			puts "Deploying files on #{get_hostname}.."
+ 			puts "+ Deploying files on #{get_hostname}.."
  			 if test("sudo cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/test-apache-tomcat-7.0.42/webapps/ROOT.war")	
  		  	puts "#{$checkmark} Deployment successful"
  		  	restart_tomcat_on get_hostname, "Attempting to restart Tomcat.."
@@ -135,38 +135,33 @@ desc "Deploy webapp"
  		end
 
 
-# TO-DO: need to restart tomcat servers
 
-desc "Restart application"
-task :restart do
-	on roles(:app), in: :sequence do |host|
-   puts "Restarting app servers.."
-   execute "sudo service nginx stop"   # dummy servers 
- 	 if test("sudo service nginx start")  # dummy servers
-    puts 'Application restart was successful'
-   else
-   	puts 'Application restart failed'
-   end
-  end
-end
-
-desc "Cleanup activities"
+desc "Cleanup activities (dependant on webapp:download)"
 task :cleanup do
+	make_task_title_pretty "CLEAN UP"
 	on roles(:app), in: :sequence do |host|
-   puts "Remove downloaded war file"
-   execute "rm ~/#{get_warfile_name_from ENV['URL']}"
+   puts "+ Removing downloaded files.."
+   if test("sudo rm /var/tmp/#{get_warfile_name_from ENV['URL']}")
+   	puts "#{$checkmark} #{get_warfile_name_from ENV['URL']} removed"
+   else
+   	error = capture "sudo rm /var/tmp/#{get_warfile_name_from ENV['URL']}"
+   	display error
+   	puts "#{$warning} Unable to remove file. Please perform this action manually."
+   end
   end
 end
 
 
 desc "Rollback to previous release"
  task :rollback do
- 	on roles(:app), in: :sequence do |host|
- 	 puts 'Attempting rollback..'
- 	 backups = capture("ls /var/tmp/backup")
+  make_task_title_pretty "ROLLBACK"
+ 	on roles(:app, :web), in: :sequence do |host|
+ 	 puts "+ Attempting rollback on #{get_hostname}"
+ 	 backups = capture("ls /mnt/backup")
  	 previous_release = find_latest_from backups	
- 	 execute "sudo cp /var/tmp/backup/#{previous_release}/ROOT*  /opt/test-apache-tomcat-7.0.42/webapps/"
- 	 puts 'Rollback successful'		
+ 	 execute "sudo cp -r /mnt/backup/#{previous_release}/ROOT*  /opt/test-apache-tomcat-7.0.42/webapps/"
+ 	 puts "#{$checkmark} Rollback successful"	
+ 	 puts "\n"
  	end
  end
 
@@ -182,5 +177,4 @@ after  'webapp:download', 'webapp:backup'
 
 before 'webapp:deploy', 'webapp:download'
 before 'webapp:deploy', 'webapp:backup'
-# after 'webapp:deploy', 'webapp:restart'
-# after 'webapp:deploy', 'webapp:cleanup'
+after 'webapp:deploy', 'webapp:cleanup'

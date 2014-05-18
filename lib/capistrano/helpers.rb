@@ -53,14 +53,15 @@ def restart_tomcat_on hostname, message
 end
 
 
-def restart_varnish_on hostname 
+def restart_varnish_on hostname, message
+	puts message 
 	execute "sudo service httpd stop" 
 	if test("sudo service httpd start")
 		puts "#{$checkmark} Varnish: running on  #{hostname}"
 	else
 		# showing failure
 		error = capture "sudo service httpd start", raise_on_non_zero_exit: false # setting exit to false to stop script from terminating
-		puts error
+		display error
 		puts "#{$cross} Restart failed on #{hostname} with non-zero exit status. Aborting.."
 		exit
 	end
@@ -79,11 +80,18 @@ def get_hostname
 	capture('hostname')
 end
 
+def make_task_title_pretty task_name
+	puts "#{$lines} #{$lines}   #{task_name}   #{$lines} #{$lines}".rjust(25)
+end
+
 
 
 def find_latest_from backups
 	dates = backups.split("\n")
 	return dates.max
 end
+
+
+
 
 
