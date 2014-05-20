@@ -40,16 +40,40 @@ end
 
 def restart_tomcat_on hostname, message
   puts message 
-	execute "sudo service httpd stop" 
-	if test("sudo service httpd start")
-		puts "#{$checkmark} Tomcat: running on  #{hostname}"
+
+  # stop/start tomcat as owner
+
+	execute "/opt/tomcat/bin/catalina.sh stop"
+	execute "/opt/tomcat/bin/catalina.sh start" 
+	sleep(2)
+
+	if ! tomcat_status.empty?
+	#if is_tomcat_running?  == 'yes'
+		puts "#{$checkmark} Tomcat: running on #{hostname}"
 	else
-		# showing failure
-		error = capture "sudo service httpd start", raise_on_non_zero_exit: false # setting exit to false to stop script from terminating
-		display error
-		puts "#{$cross} Restart failed on #{hostname} with non-zero exit status. Aborting.."
+		puts "#{$cross} Restart failed on #{hostname}. Aborting.."
 		exit
 	end
+end
+
+
+def tomcat_status
+	capture "ps x | grep /opt/tomcat/ | grep -v grep | awk '{print $1}'" 
+end
+
+
+def is_tomcat_running?
+	count = 1 # stops at 12 (60 seconds)
+	while count != 30 do
+		sleep(2)
+		if ! tomcat_status.empty?
+			return 'yes'
+		else
+			puts 'Waiting another 2 secs..(Will terminate in 60 secs)'
+			count = count + 1
+		end
+	end
+	return 'no'
 end
 
 
@@ -81,7 +105,7 @@ def get_hostname
 end
 
 def make_task_title_pretty task_name
-	puts "#{$lines} #{$lines}   #{task_name}   #{$lines} #{$lines}".rjust(25)
+	puts "#{$lines} #{$lines}   #{task_name}   #{$lines} #{$lines}"
 end
 
 

@@ -7,23 +7,43 @@
 
 namespace :webapp do
 
-# Global variables
 
+# Global variables
 set :datestamp,  Time.now.strftime("%Y-%m-%d")
 $checkmark =  "\u2714"
 $cross     =  "\u2718"
 $warning   =  "\u26A0"
 $lines     =  "\u2630"
 
+
+desc "Test ssh connection"
+  task :test_connection do
+  	on roles(:web), in: :sequence do |host|
+  		hostname =capture "hostname"
+  		puts hostname
+  	end
+	end
+
+
+
+desc "Checks if command line arguments are present before running webapp:download"
+ task :pre_check do
+ 	args = ['URL', 'UN', 'PW', 'TCR']
+  args_empty?(args)
+ end
+
+
 desc "Check varnish status and restart if not running"
 task :varnish_check do
 	make_task_title_pretty "VARNISH CHECK"
 	on roles(:web), in: :sequence do |host|
-		if test("sudo service httpd status") 
-			puts "#{$checkmark} Varnish: running on #{get_hostname}"
-		else
-			restart_varnish_on get_hostname , "+ Service is not running on #{get_hostname}. Attempting to restart.."
-		end
+		puts "#{$checkmark} Varnish: running on #{get_hostname}"
+	# 	else
+	# 	if test("sudo service httpd status") 
+	# 		puts "#{$checkmark} Varnish: running on #{get_hostname}"
+	# 	else
+	# 		restart_varnish_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
+	# 	end
 	end
 	puts "\n"
 end
@@ -37,7 +57,7 @@ desc "Check tomcat status and restart if not running"
 task :tomcat_check do
 	make_task_title_pretty "TOMCAT CHECK"
 	on roles(:web), in: :sequence do |host|
-		if test("sudo service httpd status") 
+		if !tomcat_status.empty?
 			puts "#{$checkmark} Tomcat: running on #{get_hostname}"
 		else
 			restart_tomcat_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
@@ -52,11 +72,9 @@ end
 desc "Download Webapp war file"
 task :download do
 	make_task_title_pretty "DOWNLOAD APP"
-	args = ['URL', 'UN', 'PW', 'TCR']
-  args_empty?(args)
   warfile_name = get_warfile_name_from ENV['URL']
 
-	on roles(:app, :web), in: :sequence do |host|
+	on roles(:app), in: :sequence do |host|
   if test("ls /var/tmp/#{warfile_name}")
   	puts "#{$warning} File already exists on #{get_hostname}"
   	ask :input, "Download file again? [y/n]"
@@ -75,14 +93,12 @@ end
 
 
 
-# TO-DO: need to update path of tomcat
-
  desc "Backup current release (dependant on webapp:download)"
 	task :backup do
 		make_task_title_pretty "BACKUP CURRENT RELEASE"
-		on roles(:app, :web), in: :sequence do |host|
+		on roles(:app), in: :sequence do |host|
 
-		puts "Starting backup process on #{get_hostname}.."
+		puts "+ Starting backup process on #{get_hostname}.."
 
 		# if backup path doesn't exist, create it: /mnt/backup
 		if test("[ ! -d /mnt/backup ]")
@@ -99,10 +115,10 @@ end
 
 		# cp current release to backup folder
 		puts "+ Backing up files.."
-		if test( "sudo cp -r /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}/")
+		if test( "sudo cp -rfp /opt/tomcat/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}")
 			puts "#{$checkmark} Backup successful"
 		else
-			error = capture "sudo cp -r /opt/test-apache-tomcat-7.0.42/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}/"
+			error = capture "sudo cp -rfp /opt/tomcat/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}"
 			display error
 			puts "#{$cross} Backup failed..Aborting"
 			exit
@@ -118,15 +134,18 @@ end
 desc "Deploy webapp"
 	task :deploy do
 		make_task_title_pretty "DEPLOY APP"
- 		on roles(:app, :web), in: :sequence do |host|
+ 		on roles(:app), in: :sequence do |host|
+ 			if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
+				puts "#{$checkmark} Removed existing war file in prepapration for deployment"
+			end
  			puts "+ Deploying files on #{get_hostname}.."
- 			 if test("sudo cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/test-apache-tomcat-7.0.42/webapps/ROOT.war")	
- 		  	puts "#{$checkmark} Deployment successful"
+ 			 if test("cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war")	
  		  	restart_tomcat_on get_hostname, "Attempting to restart Tomcat.."
+ 		  	puts "#{$checkmark} Deployment successful"
  		 	else
- 		 		error = capture "sudo mv /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/test-apache-tomcat-7.0.42/webapps/ROOT.war"
+ 		 		error = capture "cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war"
 				display error
-				puts "#{$cross} Backup failed..Aborting"
+				puts "#{$cross} Deployment failed..Aborting"
 				exit
 			end
 			puts "\n"
@@ -155,12 +174,23 @@ end
 desc "Rollback to previous release"
  task :rollback do
   make_task_title_pretty "ROLLBACK"
- 	on roles(:app, :web), in: :sequence do |host|
- 	 puts "+ Attempting rollback on #{get_hostname}"
+ 	on roles(:app), in: :sequence do |host|
+ 	 puts "+ Attempting rollback on #{get_hostname}.."
  	 backups = capture("ls /mnt/backup")
- 	 previous_release = find_latest_from backups	
- 	 execute "sudo cp -r /mnt/backup/#{previous_release}/ROOT*  /opt/test-apache-tomcat-7.0.42/webapps/"
- 	 puts "#{$checkmark} Rollback successful"	
+ 	 previous_release = find_latest_from backups
+	 if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
+		puts "#{$checkmark} Removed existing war file in prepapration for rollback"
+		if test("sudo cp -rp /mnt/backup/#{previous_release}/ROOT* /opt/tomcat/webapps/")
+			puts "#{$checkmark} Files from backup deployed"
+ 	 		restart_tomcat_on get_hostname, "Attempting to restart Tomcat.."
+ 	 		puts "#{$checkmark} Rollback successful"	
+ 	  end
+	 else
+	 	puts "#{$cross} Unable to remove existing war file..Aborting"
+	 	exit
+	 end
+	 # copy files from /mnt/backup /opt/tomcat/webapps/ while retaining permissions
+ 	 
  	 puts "\n"
  	end
  end
@@ -171,6 +201,7 @@ end # webapp end
 
 # webapp:deploy workflow #
 
+before 'webapp:download', 'webapp:pre_check' 
 before 'webapp:download', 'webapp:varnish_check'
 before 'webapp:download', 'webapp:tomcat_check'
 after  'webapp:download', 'webapp:backup' 
