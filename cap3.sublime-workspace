@@ -8,8 +8,16 @@
 				"tomcat_status"
 			],
 			[
+				"tomcat",
+				"tomcat_status"
+			],
+			[
 				"get",
 				"get_hostname"
+			],
+			[
+				"web",
+				"webapps"
 			],
 			[
 				"CHE",
@@ -506,14 +514,6 @@
 			[
 				"wo",
 				"workaround"
-			],
-			[
-				"user",
-				"user_group"
-			],
-			[
-				"escala",
-				"escalate_to_CA"
 			]
 		]
 	},
@@ -523,16 +523,43 @@
 			"file": "lib/capistrano/tasks/webapp.rake",
 			"settings":
 			{
-				"buffer_size": 5309,
+				"buffer_size": 5968,
 				"line_ending": "Unix",
 				"name": "namespace :webapp do"
 			}
 		},
 		{
-			"file": "config/deploy/staging.rb",
+			"contents": "#!/bin/bash\n#\n# tomcat     This shell script takes care of starting and stopping Tomcat\n#\n# chkconfig: - 80 20\n#\n### BEGIN INIT INFO\n# Provides: tomcat\n# Required-Start: $network $syslog\n# Required-Stop: $network $syslog\n# Default-Start:\n# Default-Stop:\n# Short-Description: start and stop tomcat\n### END INIT INFO\n \nTOMCAT_USER=vagrant\nTOMCAT_HOME=\"/opt/tomcat\"\nSHUTDOWN_WAIT=45\n \ntomcat_pid() {\n    echo `ps aux | grep org.apache.catalina.startup.Bootstrap | grep -v grep | awk '{ print $2 }'`\n}\n \nstart() {\n    pid=$(tomcat_pid)\n    if [ -n \"$pid\" ]\n    then\n        echo \"Tomcat is already running (pid: $pid)\"\n    else\n        # Start tomcat\n        echo \"Starting tomcat\"\n        /bin/su - -c \"cd $TOMCAT_HOME/bin && $TOMCAT_HOME/bin/startup.sh\" $TOMCAT_USER\n    fi\n    return 0\n}\n \nstop() {\n    pid=$(tomcat_pid)\n    if [ -n \"$pid\" ]\n    then\n        echo \"Stoping Tomcat\"\n        /bin/su - -c \"cd $TOMCAT_HOME/bin && $TOMCAT_HOME/bin/shutdown.sh\" $TOMCAT_USER\n \n    let kwait=$SHUTDOWN_WAIT\n    count=0\n    count_by=5\n    until [ `ps -p $pid | grep -c $pid` = '0' ] || [ $count -gt $kwait ]\n    do\n        echo \"Waiting for processes to exit. Timeout before we kill the pid: ${count}/${kwait}\"\n        sleep $count_by\n        let count=$count+$count_by;\n    done\n \n    if [ $count -gt $kwait ]; then\n        echo \"Killing processes which didn't stop after $SHUTDOWN_WAIT seconds\"\n        kill -9 $pid\n    fi\n    else\n        echo \"Tomcat is not running\"\n    fi\n \n    return 0\n}\n \ncase $1 in\n    start)\n        start\n        ;;\n    stop)\n        stop\n        ;;\n    restart)\n        stop\n        start\n        ;;\n    status)\n       pid=$(tomcat_pid)\n        if [ -n \"$pid\" ]\n        then\n           echo \"Tomcat is running with pid: $pid\"\n        else\n           echo \"Tomcat is not running\"\n        fi\n        ;;\nesac\n \nexit 0",
 			"settings":
 			{
-				"buffer_size": 1622,
+				"buffer_size": 1834,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".gitignore",
+			"settings":
+			{
+				"buffer_size": 46,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "http://tomcat.apache.org/tomcat-6.0-doc/appdev/sample/sample.war\nhttps://gwt-examples.googlecode.com/files/Calendar.war\n\n\n\n\n#TO-DO LIST:\n# need to update status/stop/start to reflect tomcat\n# need to update status/stop/start to reflect varnish\n# roles need to be updated\n\nnamespace :webapp do\n\n\n# Global variables\nset :datestamp,  Time.now.strftime(\"%Y-%m-%d\")\n$checkmark =  \"\\u2714\"\n$cross     =  \"\\u2718\"\n$warning   =  \"\\u26A0\"\n$lines     =  \"\\u2630\"\n\n\ndesc \"Test ssh connection\"\n  task :test_connection do\n  	on roles(:web), in: :sequence do |host|\n  		if test(\"hostname\")\n  			hostname = capture \"hostname\"\n  			puts \"#{$checkmark} #{hostname}\"\n  		end\n  	end\n	end\n\n\n\ndesc \"Checks if command line arguments are present before running webapp:download\"\n task :pre_check do\n 	args = ['URL', 'UN', 'PW', 'TCR']\n  args_empty?(args)\n end\n\n\ndesc \"Check varnish status and restart if not running\"\ntask :varnish_check do\n	make_task_title_pretty \"VARNISH CHECK\"\n	on roles(:web), in: :sequence do |host|\n		puts \"#{$checkmark} Varnish: running on #{get_hostname}\"\n\n	# 	if test(\"sudo service httpd status\") \n	# 		puts \"#{$checkmark} Varnish: running on #{get_hostname}\"\n	# 	else\n	# 		restart_varnish_on get_hostname, \"+ Service is not running on #{get_hostname}. Attempting to restart..\"\n	# 	end\n	end\n	puts \"\\n\"\nend\n\n\n\n\n# TO-DO: need to update status/stop/start to reflect tomcat\n\ndesc \"Check tomcat status and restart if not running\"\n	task :tomcat_check do\n		make_task_title_pretty \"TOMCAT CHECK\"\n		on roles(:web), in: :sequence do |host|\n			if !tomcat_status.empty?\n				puts \"#{$checkmark} Tomcat: running on #{get_hostname}\"\n			else\n				restart_tomcat_on get_hostname, \"+ Service is not running on #{get_hostname}. Attempting to restart..\"\n			end\n		end\n		puts \"\\n\"\n	end\n\n\n\n\ndesc \"Download Webapp war file\"\n	task :download do\n		make_task_title_pretty \"DOWNLOAD APP\"\n	  warfile_name = get_warfile_name_from ENV['URL']\n\n		on roles(:app), in: :sequence do |host|\n	  if test(\"ls /var/tmp/#{warfile_name}\")\n	  	puts \"#{$warning} File already exists on #{get_hostname}\"\n	  	ask :input, \"Download file again? [y/n]\"\n	  	if 'yY'.include? fetch(:input)\n	 		 download_warfile_from get_hostname, warfile_name\n	  	else\n	  		puts \"#{$checkmark} Using existing file - Nothing to do.\"\n	  	end\n	  else\n		  download_warfile_from get_hostname, warfile_name\n		end # end-test\n		puts \"\\n\"\n	 end\n	 puts \"\\n\"\n	end\n\n\n\n desc \"Backup current release (dependant on webapp:download)\"\n	task :backup do\n		make_task_title_pretty \"BACKUP CURRENT RELEASE\"\n		on roles(:app), in: :sequence do |host|\n\n		puts \"+ Starting backup process on #{get_hostname}..\"\n\n		# if backup path doesn't exist, create it: /mnt/backup\n		if test(\"[ ! -d /mnt/backup ]\")\n			puts \"+ Creating backup point /mnt/backup\"\n			execute \"sudo mkdir /mnt/backup\"\n			puts \"#{$checkmark} Created /mnt/backup\"\n		end\n\n		# create backup directory with date_tcr#\n		if test(\"[ ! -d /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']} ]\")\n			puts \"+ Creating backup dir /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}\"\n			execute \"sudo mkdir /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}\"\n		end\n\n		# cp current release to backup folder\n		puts \"+ Backing up files..\"\n		if test( \"sudo cp -rfp /opt/tomcat/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}\")\n			puts \"#{$checkmark} Backup successful\"\n		else\n			error = capture \"sudo cp -rfp /opt/tomcat/webapps/ROOT* /mnt/backup/#{fetch(:datestamp)}_#{ENV['TCR']}\"\n			display error\n			puts \"#{$cross} Backup failed..Aborting\"\n			exit\n		end\n		puts \"\\n\"\n	 end\n	 puts \"\\n\"\n	end #end-task\n\n\n# TO-DO: need to update path of tomcat\n\ndesc \"Deploy webapp\"\n	task :deploy do\n		make_task_title_pretty \"DEPLOY APP\"\n 		on roles(:app), in: :sequence do |host|\n 			if test(\"sudo rm -rf /opt/tomcat/webapps/ROOT*\")\n				puts \"#{$checkmark} Removed existing war file in prepapration for deployment\"\n			end\n 			puts \"+ Deploying files on #{get_hostname}..\"\n 			 if test(\"cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war\")	\n 		  	restart_tomcat_on get_hostname, \"Attempting to restart Tomcat..\"\n 		  	puts \"#{$checkmark} Deployment successful\"\n 		 	else\n 		 		error = capture \"cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war\"\n				display error\n				puts \"#{$cross} Deployment failed..Aborting\"\n				exit\n			end\n			puts \"\\n\"\n 		 end\n 		 puts \"\\n\"\n 		end\n\n\n\ndesc \"Cleanup activities (dependant on webapp:download)\"\n	task :cleanup do\n		make_task_title_pretty \"CLEAN UP\"\n		on roles(:app), in: :sequence do |host|\n	   puts \"+ Removing downloaded files..\"\n	   if test(\"sudo rm /var/tmp/#{get_warfile_name_from ENV['URL']}\")\n	   	puts \"#{$checkmark} #{get_warfile_name_from ENV['URL']} removed\"\n	   else\n	   	error = capture \"sudo rm /var/tmp/#{get_warfile_name_from ENV['URL']}\"\n	   	display error\n	   	puts \"#{$warning} Unable to remove file. Please perform this action manually.\"\n	   end\n	  end\n	end\n\n\ndesc \"Rollback to previous release\"\n task :rollback do\n  make_task_title_pretty \"ROLLBACK\"\n 	on roles(:app), in: :sequence do |host|\n 	 puts \"+ Attempting rollback on #{get_hostname}..\"\n 	 backups = capture(\"ls /mnt/backup\")\n 	 previous_release = find_latest_from backups\n	 if test(\"sudo rm -rf /opt/tomcat/webapps/ROOT*\")\n		puts \"#{$checkmark} Removed existing war file in prepapration for rollback\"\n		if test(\"sudo cp -rp /mnt/backup/#{previous_release}/ROOT* /opt/tomcat/webapps/\")\n			puts \"#{$checkmark} Files from backup deployed\"\n 	 		restart_tomcat_on get_hostname, \"Attempting to restart Tomcat..\"\n 	 		puts \"#{$checkmark} Rollback successful\"	\n 	  end\n	 else\n	 	puts \"#{$cross} Unable to remove existing war file..Aborting\"\n	 	exit\n	 end\n	 # copy files from /mnt/backup /opt/tomcat/webapps/ while retaining permissions\n 	 \n 	 puts \"\\n\"\n 	end\n end\n\n\nend # webapp end\n\n\n# webapp:deploy workflow #\n\nbefore 'webapp:download', 'webapp:pre_check' \nbefore 'webapp:download', 'webapp:varnish_check'\nbefore 'webapp:download', 'webapp:tomcat_check'\nafter  'webapp:download', 'webapp:backup' \n\nbefore 'webapp:deploy', 'webapp:download'\nbefore 'webapp:deploy', 'webapp:backup'\nafter 'webapp:deploy', 'webapp:cleanup'\n\n\n\n ",
+			"settings":
+			{
+				"buffer_size": 6121,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "# Simple Role Syntax\n# ==================\n# Supports bulk-adding hosts to roles, the primary server in each group\n# is considered to be the first unless any hosts have the primary\n# property set.  Don't declare `role :all`, it's a meta role.\n\nset :stage, 'staging'\n\n# role :web, \"192.168.0.12\"\n# role :app,  \"192.168.0.12\"\n# role :db, \"192.168.0.12\", primary:true\n#role :app, %w{deploy@example.com}\n#role :web, %w{deploy@example.com}\n#role :db,  %w{deploy@example.com}\n\n\n# Extended Server Syntax\n# ======================\n# This can be used to drop a more detailed server definition into the\n# server list. The second argument is a, or duck-types, Hash and is\n# used to set extended properties on the server.\n\nserver '192.168.33.10', user: 'vagrant', roles: %w{web app db}\nserver '192.168.33.11', user: 'vagrant', roles: %w{web app}\n\n\n# Custom SSH Options\n# ==================\n# You may pass any option but keep in mind that net/ssh understands a\n# limited set of options, consult[net/ssh documentation](http://net-ssh.github.io/net-ssh/classes/Net/SSH.html#method-c-start).\n#\n# Global options\n# --------------\n#  set :ssh_options, {\n#    keys: %w(/home/rlisowski/.ssh/id_rsa),\n#    forward_agent: false,\n#    auth_methods: %w(password)\n#  }\n#\n# And/or per server (overrides global)\n# ------------------------------------\n# server 'example.com',\n#   user: 'user_name',\n#   roles: %w{web app},\n#   ssh_options: {\n#     user: 'user_name', # overrides user setting above\n#     keys: %w(/home/user_name/.ssh/id_rsa),\n#     forward_agent: false,\n#     auth_methods: %w(publickey password)\n#     # password: 'please use keys'\n#   }\n",
+			"file": "config/deploy/staging.rb",
+			"file_size": 1625,
+			"file_write_time": 1400546981000000,
+			"settings":
+			{
+				"buffer_size": 1625,
 				"line_ending": "Unix"
 			}
 		},
@@ -545,13 +572,10 @@
 			}
 		},
 		{
-			"contents": "require 'uri'\n\ndef args_empty? args\n	count = 0\n	args.each do |key|\n		if ENV[key].nil?\n			puts \"#{$warning} Missing argument: #{key}\"\n			count = count + 1\n		else\n			if ENV[key] == ''\n				count = count + 1\n			end\n		end\n	end\n if count > 0\n 	puts \"Run like cap staging task-name-space:task-name URL=path-to-file UN=username PW=password TCR=TCR#\"\n 	exit\n end\nend\n\n\ndef get_warfile_name_from url\n	uri = URI.parse(url)\n	File.basename(uri.path)\nend\n\n\ndef download_warfile_from hostname, warfile_name\n	puts '+ Downloading app..(May take a while depending on the file size)'\n	execute \"cd /var/tmp && wget --user=#{ENV['UN']} --password=#{ENV['PW']} #{ENV['URL']} -O /var/tmp/#{warfile_name}\"\n	if test(\"ls /var/tmp/#{warfile_name}\")\n	   puts \"#{$checkmark} Downloaded #{warfile_name} on #{hostname}\"\n	 else\n	   puts \"#{$cross} Cannot find #{warfile_name} in home dir. Aborting..\"\n	   exit \n	 end\nend\n\n\n\ndef restart_tomcat_on hostname, message\n  puts message \n	execute \"sudo /opt/tomcat/bin/catalina.sh stop\"\n	execute \"sudo /opt/tomcat/bin/catalina.sh start\" \n	\n\n	if is_tomcat_running?  == 'yes'\n		puts \"#{$checkmark} Tomcat: running on #{hostname}\"\n	else\n		puts \"#{$cross} Restart failed after  on #{hostname}. Aborting..\"\n		exit\n	end\nend\n\n\ndef tomcat_status\n	capture \"sudo ps x | grep /opt/tomcat/ | grep -v grep | awk '{print $1}'\" \nend\n\n\ndef is_tomcat_running?\n	count = 1 # stops at 12 (60 seconds)\n	while count != 30 do\n		sleep(2)\n		if ! tomcat_status.empty?\n			return 'yes'\n		else\n			puts 'Waiting another 2 secs..(Will terminate in 60 secs)'\n			count = count + 1\n		end\n	end\n	return 'no'\nend\n\n\ndef restart_varnish_on hostname, message\n	puts message \n	execute \"sudo service httpd stop\" \n	if test(\"sudo service httpd start\")\n		puts \"#{$checkmark} Varnish: running on  #{hostname}\"\n	else\n		# showing failure\n		error = capture \"sudo service httpd start\", raise_on_non_zero_exit: false # setting exit to false to stop script from terminating\n		display error\n		puts \"#{$cross} Restart failed on #{hostname} with non-zero exit status. Aborting..\"\n		exit\n	end\nend\n\n\ndef display error\nputs 'MESSAGE:'\nputs error\nputs 'END'\nputs \"\\n\"\nend\n\n\ndef get_hostname\n	capture('hostname')\nend\n\ndef make_task_title_pretty task_name\n	puts \"#{$lines} #{$lines}   #{task_name}   #{$lines} #{$lines}\".rjust(25)\nend\n\n\n\ndef find_latest_from backups\n	dates = backups.split(\"\\n\")\n	return dates.max\nend\n\n\n\n\n\n",
 			"file": "lib/capistrano/helpers.rb",
-			"file_size": 2364,
-			"file_write_time": 1400473954000000,
 			"settings":
 			{
-				"buffer_size": 2371,
+				"buffer_size": 2408,
 				"line_ending": "Unix"
 			}
 		}
@@ -751,6 +775,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"162",
+			"includes",
+			"test-apache",
 			"star",
 			"hostname",
 			"warfile",
@@ -860,7 +887,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -868,15 +895,15 @@
 					"file": "lib/capistrano/tasks/webapp.rake",
 					"settings":
 					{
-						"buffer_size": 5309,
+						"buffer_size": 5968,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								497,
-								497
+								1430,
+								1430
 							]
 						],
 						"settings":
@@ -886,25 +913,77 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 178.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "config/deploy/staging.rb",
 					"settings":
 					{
-						"buffer_size": 1622,
+						"buffer_size": 1834,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								790,
-								790
+								316,
+								316
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/ShellScript/Shell-Unix-Generic.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": ".gitignore",
+					"settings":
+					{
+						"buffer_size": 46,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								36,
+								36
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"settings":
+					{
+						"buffer_size": 6121,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								136,
+								136
 							]
 						],
 						"settings":
@@ -918,7 +997,33 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 4,
+					"file": "config/deploy/staging.rb",
+					"settings":
+					{
+						"buffer_size": 1625,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								793,
+								793
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
 					"file": "config/deploy.rb",
 					"settings":
 					{
@@ -946,19 +1051,19 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 6,
 					"file": "lib/capistrano/helpers.rb",
 					"settings":
 					{
-						"buffer_size": 2371,
+						"buffer_size": 2408,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1143,
-								1143
+								357,
+								357
 							]
 						],
 						"settings":
@@ -967,7 +1072,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 270.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1018,6 +1123,26 @@
 		[
 			[
 				"",
+				"lib/capistrano/helpers.rb"
+			],
+			[
+				"he",
+				"lib/capistrano/helpers.rb"
+			],
+			[
+				"st",
+				"config/deploy/staging.rb"
+			],
+			[
+				"w",
+				"lib/capistrano/tasks/webapp.rake"
+			],
+			[
+				"s",
+				"lib/capistrano/helpers.rb"
+			],
+			[
+				"de",
 				"config/deploy.rb"
 			],
 			[
@@ -1025,24 +1150,8 @@
 				"lib/capistrano/tasks/webapp.rake"
 			],
 			[
-				"st",
-				"config/deploy/staging.rb"
-			],
-			[
-				"s",
-				"config/deploy/staging.rb"
-			],
-			[
-				"de",
-				"config/deploy.rb"
-			],
-			[
 				"d",
 				"config/deploy.rb"
-			],
-			[
-				"w",
-				"lib/capistrano/tasks/webapp.rake"
 			],
 			[
 				"read",

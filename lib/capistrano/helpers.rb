@@ -43,12 +43,14 @@ def restart_tomcat_on hostname, message
 
   # stop/start tomcat as owner
 
-	execute "/opt/tomcat/bin/catalina.sh stop"
-	execute "/opt/tomcat/bin/catalina.sh start" 
-	sleep(2)
+	# execute "/opt/tomcat/bin/catalina.sh stop"
+	# execute "/opt/tomcat/bin/catalina.sh start" 
+	execute "sudo /etc/init.d/tomcat stop"
+	execute "sudo /etc/init.d/tomcat start"
+	#sleep(2)
 
-	if ! tomcat_status.empty?
-	#if is_tomcat_running?  == 'yes'
+	if tomcat_status.include? 'pid'
+	# if is_tomcat_running?  == 'yes'
 		puts "#{$checkmark} Tomcat: running on #{hostname}"
 	else
 		puts "#{$cross} Restart failed on #{hostname}. Aborting.."
@@ -58,18 +60,20 @@ end
 
 
 def tomcat_status
-	capture "ps x | grep /opt/tomcat/ | grep -v grep | awk '{print $1}'" 
+	# capture "ps x | grep /opt/tomcat/ | grep -v grep | awk '{print $1}'" 
+	capture "sudo /etc/init.d/tomcat status"
 end
 
 
 def is_tomcat_running?
 	count = 1 # stops at 12 (60 seconds)
 	while count != 30 do
-		sleep(2)
+		
 		if ! tomcat_status.empty?
 			return 'yes'
 		else
 			puts 'Waiting another 2 secs..(Will terminate in 60 secs)'
+			sleep(2)
 			count = count + 1
 		end
 	end

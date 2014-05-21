@@ -57,7 +57,8 @@ desc "Check tomcat status and restart if not running"
 task :tomcat_check do
 	make_task_title_pretty "TOMCAT CHECK"
 	on roles(:web), in: :sequence do |host|
-		if !tomcat_status.empty?
+		if tomcat_status.include? 'pid'
+		#if !tomcat_status.empty?
 			puts "#{$checkmark} Tomcat: running on #{get_hostname}"
 		else
 			restart_tomcat_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
@@ -135,12 +136,12 @@ desc "Deploy webapp"
 	task :deploy do
 		make_task_title_pretty "DEPLOY APP"
  		on roles(:app), in: :sequence do |host|
- 			if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
+ 			if test("ls /opt/tomcat/webapps/ROOT* && sudo rm -rf /opt/tomcat/webapps/ROOT*")
 				puts "#{$checkmark} Removed existing war file in prepapration for deployment"
 			end
  			puts "+ Deploying files on #{get_hostname}.."
  			 if test("cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war")	
- 		  	restart_tomcat_on get_hostname, "Attempting to restart Tomcat.."
+ 		  	restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
  		  	puts "#{$checkmark} Deployment successful"
  		 	else
  		 		error = capture "cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war"
@@ -155,7 +156,34 @@ desc "Deploy webapp"
 
 
 
-desc "Cleanup activities (dependant on webapp:download)"
+
+desc "Rollback to previous release"
+ task :rollback do
+  make_task_title_pretty "ROLLBACK"
+ 	on roles(:app), in: :sequence do |host|
+ 	 puts "+ Attempting rollback on #{get_hostname}.."
+ 	 backups = capture("ls /mnt/backup")
+ 	 previous_release = find_latest_from backups
+	 if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
+		puts "#{$checkmark} Removed existing war file in prepapration for rollback"
+		if test("sudo cp -rp /mnt/backup/#{previous_release}/ROOT* /opt/tomcat/webapps/")
+			puts "#{$checkmark} Files from backup deployed"
+ 	 		restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
+ 	 		puts "#{$checkmark} Rollback successful"	
+ 	  end
+	 else
+	 	puts "#{$cross} Unable to remove existing war file..Aborting"
+	 	exit
+	 end
+	 # copy files from /mnt/backup /opt/tomcat/webapps/ while retaining permissions
+ 	 
+ 	 puts "\n"
+ 	end
+ end
+
+
+
+ desc "Cleanup activities (dependant on webapp:download)"
 task :cleanup do
 	make_task_title_pretty "CLEAN UP"
 	on roles(:app), in: :sequence do |host|
@@ -171,31 +199,6 @@ task :cleanup do
 end
 
 
-desc "Rollback to previous release"
- task :rollback do
-  make_task_title_pretty "ROLLBACK"
- 	on roles(:app), in: :sequence do |host|
- 	 puts "+ Attempting rollback on #{get_hostname}.."
- 	 backups = capture("ls /mnt/backup")
- 	 previous_release = find_latest_from backups
-	 if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
-		puts "#{$checkmark} Removed existing war file in prepapration for rollback"
-		if test("sudo cp -rp /mnt/backup/#{previous_release}/ROOT* /opt/tomcat/webapps/")
-			puts "#{$checkmark} Files from backup deployed"
- 	 		restart_tomcat_on get_hostname, "Attempting to restart Tomcat.."
- 	 		puts "#{$checkmark} Rollback successful"	
- 	  end
-	 else
-	 	puts "#{$cross} Unable to remove existing war file..Aborting"
-	 	exit
-	 end
-	 # copy files from /mnt/backup /opt/tomcat/webapps/ while retaining permissions
- 	 
- 	 puts "\n"
- 	end
- end
-
-
 end # webapp end
 
 
@@ -208,4 +211,4 @@ after  'webapp:download', 'webapp:backup'
 
 before 'webapp:deploy', 'webapp:download'
 before 'webapp:deploy', 'webapp:backup'
-after 'webapp:deploy', 'webapp:cleanup'
+# after 'webapp:deploy', 'webapp:cleanup'
