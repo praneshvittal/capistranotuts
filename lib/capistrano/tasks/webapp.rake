@@ -36,7 +36,6 @@ desc "Checks if command line arguments are present before running webapp:downloa
   args_empty?(args) 
  end
 
-
 desc "Check varnish status and restart if not running"
 task :varnish_check do
 	make_task_title_pretty "VARNISH CHECK"
@@ -49,12 +48,11 @@ end
 
 
 
-# TO-DO: need to update status/stop/start to reflect tomcat
-
 desc "Check tomcat status and restart if not running"
 task :tomcat_check do
 	make_task_title_pretty "TOMCAT CHECK"
 	on roles(:web), in: :sequence do |host|
+		# 
 		if tomcat_status.include? 'pid'
 		#if !tomcat_status.empty?
 			puts "#{$checkmark} Tomcat: running on #{get_hostname}"
@@ -74,6 +72,7 @@ task :download do
   warfile_name = get_warfile_name_from ENV['URL']
 
 	on roles(:app), in: :sequence do |host|
+	# if file exists prompt user to confirm if re-download required
   if test("ls /var/tmp/#{warfile_name}")
   	puts "#{$warning} File already exists on #{get_hostname}"
   	ask :input, "Download file again? [y/n]"
@@ -83,6 +82,7 @@ task :download do
   		puts "#{$checkmark} Using existing file - Nothing to do."
   	end
   else
+  	# download since file doesn't exist
 	  download_warfile_from get_hostname, warfile_name
 	end # end-test
 	puts "\n"
@@ -130,14 +130,17 @@ end
 
 # TO-DO: need to update path of tomcat
 
-desc "Deploy webapp"
+desc "Deploy webapp to Tomcat"
 	task :deploy do
 		make_task_title_pretty "DEPLOY APP"
  		on roles(:app), in: :sequence do |host|
+
+ 			# remove existing ROOT* from tomcat webapps dir
  			if test("ls /opt/tomcat/webapps/ROOT* && sudo rm -rf /opt/tomcat/webapps/ROOT*")
 				puts "#{$checkmark} Removed existing war file in prepapration for deployment"
 			end
  			puts "+ Deploying files on #{get_hostname}.."
+ 			 # copy new war file from to tomcat webapp dir and restart tomcat
  			 if test("cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war")	
  		  	restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
  		  	puts "#{$checkmark} Deployment successful"
@@ -163,13 +166,15 @@ desc "Rollback to previous release"
  	 backups = capture("ls /mnt/backup") # get backup dir name
  	 previous_release = find_latest_from backups # 'latest' from backup dir is the previous release
 	 
+	 # remove existing ROOT* from tomcat webapps dir 
 	 if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
 		puts "#{$checkmark} Removed existing war file in prepapration for rollback"
 		
-		puts "Rolling back to: #{previous_release}"
+		puts "Rolling back to: #{previous_release}.."
 		
+		# copy the previous release from backup dir to the tomcat webapps dir and restart tomcat
 		if test("sudo cp -rp /mnt/backup/#{previous_release}/ROOT* /opt/tomcat/webapps/")
-			puts "#{$checkmark} Files from backup deployed"
+			puts "#{$checkmark} Files from #{previous_release} deployed"
  	 		restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
  	 		puts "#{$checkmark} Rollback successful"	
  	 	else
@@ -188,6 +193,7 @@ desc "Rollback to previous release"
  end
 
 
+# use cleanup to remove any unwanted files
 
  desc "Cleanup activities (dependant on webapp:download)"
 task :cleanup do
@@ -205,7 +211,7 @@ task :cleanup do
 end
 
 
-end # webapp end
+end # webapp namespace end
 
 
 # webapp:deploy workflow #
@@ -216,4 +222,4 @@ before 'webapp:download', 'webapp:tomcat_check'
 after  'webapp:download', 'webapp:backup' 
 
 before 'webapp:deploy', 'webapp:download'
-#after 'webapp:deploy', 'webapp:cleanup'
+after 'webapp:deploy', 'webapp:cleanup'
