@@ -3,11 +3,13 @@ require 'uri'
 def args_empty? args
 	count = 0
 	args.each do |key|
+		# check if the ENV arguments exist
 		if ENV[key].nil?
 			puts "#{$warning} Missing argument: #{key}"
 			count = count + 1
 		else
-			if ENV[key] == ''
+			# check if the ENV values are empty
+			if ENV[key].empty?
 				count = count + 1
 			end
 		end
@@ -27,7 +29,7 @@ end
 
 def download_warfile_from hostname, warfile_name
 	puts '+ Downloading app..(May take a while depending on the file size)'
-	execute "cd /var/tmp && wget --user=#{ENV['UN']} --password=#{ENV['PW']} #{ENV['URL']} -O /var/tmp/#{warfile_name}"
+	execute "wget --user=#{ENV['UN']} --password=#{ENV['PW']} #{ENV['URL']} -O /var/tmp/#{warfile_name}"
 	if test("ls /var/tmp/#{warfile_name}")
 	   puts "#{$checkmark} Downloaded #{warfile_name} on #{hostname}"
 	 else
@@ -66,7 +68,7 @@ end
 
 
 def is_tomcat_running?
-	count = 1 # stops at 12 (60 seconds)
+	count = 2 # stops at 12 (60 seconds)
 	while count != 30 do
 		
 		if ! tomcat_status.empty?
@@ -74,7 +76,7 @@ def is_tomcat_running?
 		else
 			puts 'Waiting another 2 secs..(Will terminate in 60 secs)'
 			sleep(2)
-			count = count + 1
+			count = count + 2
 		end
 	end
 	return 'no'
