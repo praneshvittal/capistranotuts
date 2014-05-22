@@ -1,20 +1,22 @@
 #TO-DO LIST:
-# need to update status/stop/start to reflect tomcat
-# need to update status/stop/start to reflect varnish
-# need to update path of tomcat
-# need to restart tomcat servers
-# roles need to be updated
+# varnish restart needs to be implemented after deployment
+# varnish check needs to be configued
 
 namespace :webapp do
 
 
 # Global variables
 set :datestamp,  Time.now.strftime("%Y-%m-%d")
+
+# unicode for status symbols
 $checkmark =  "\u2714"
 $cross     =  "\u2718"
 $warning   =  "\u26A0"
 $lines     =  "\u2630"
 
+
+
+# Not used in deployment flow however useful for testing
 
 desc "Test ssh connection"
   task :test_connection do
@@ -29,7 +31,9 @@ desc "Test ssh connection"
 desc "Checks if command line arguments are present before running webapp:download"
  task :pre_check do
  	args = ['URL', 'UN', 'PW', 'TCR']
-  args_empty?(args)
+
+  # check if the ENV global variable has command-line arguments
+  args_empty?(args) 
  end
 
 
@@ -38,12 +42,6 @@ task :varnish_check do
 	make_task_title_pretty "VARNISH CHECK"
 	on roles(:web), in: :sequence do |host|
 		puts "#{$checkmark} Varnish: running on #{get_hostname}"
-	# 	else
-	# 	if test("sudo service httpd status") 
-	# 		puts "#{$checkmark} Varnish: running on #{get_hostname}"
-	# 	else
-	# 		restart_varnish_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
-	# 	end
 	end
 	puts "\n"
 end
@@ -162,20 +160,28 @@ desc "Rollback to previous release"
   make_task_title_pretty "ROLLBACK"
  	on roles(:app), in: :sequence do |host|
  	 puts "+ Attempting rollback on #{get_hostname}.."
- 	 backups = capture("ls /mnt/backup")
- 	 previous_release = find_latest_from backups
+ 	 backups = capture("ls /mnt/backup") # get backup dir name
+ 	 previous_release = find_latest_from backups # 'latest' from backup dir is the previous release
+	 
 	 if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
 		puts "#{$checkmark} Removed existing war file in prepapration for rollback"
+		
+		puts "Rolling back to: #{previous_release}"
+		
 		if test("sudo cp -rp /mnt/backup/#{previous_release}/ROOT* /opt/tomcat/webapps/")
 			puts "#{$checkmark} Files from backup deployed"
  	 		restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
  	 		puts "#{$checkmark} Rollback successful"	
+ 	 	else
+ 	 		# if rollback to ../webapps/ dir fails exit script
+ 	 		puts "#{$cross} Rollback failed"
+ 	 		exit	
  	  end
-	 else
+
+	 else	
 	 	puts "#{$cross} Unable to remove existing war file..Aborting"
 	 	exit
 	 end
-	 # copy files from /mnt/backup /opt/tomcat/webapps/ while retaining permissions
  	 
  	 puts "\n"
  	end
@@ -210,5 +216,4 @@ before 'webapp:download', 'webapp:tomcat_check'
 after  'webapp:download', 'webapp:backup' 
 
 before 'webapp:deploy', 'webapp:download'
-before 'webapp:deploy', 'webapp:backup'
-# after 'webapp:deploy', 'webapp:cleanup'
+#after 'webapp:deploy', 'webapp:cleanup'
