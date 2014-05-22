@@ -14,8 +14,6 @@ $cross     =  "\u2718"
 $warning   =  "\u26A0"
 $lines     =  "\u2630"
 
-
-
 # Not used in deployment flow however useful for testing
 
 desc "Test ssh connection"
@@ -25,8 +23,6 @@ desc "Test ssh connection"
   		puts hostname
   	end
 	end
-
-
 
 desc "Checks if command line arguments are present before running webapp:download"
  task :pre_check do
@@ -46,8 +42,6 @@ task :varnish_check do
 end
 
 
-
-
 desc "Check tomcat status and restart if not running"
 task :tomcat_check do
 	make_task_title_pretty "TOMCAT CHECK"
@@ -62,8 +56,6 @@ task :tomcat_check do
 	end
 	puts "\n"
 end
-
-
 
 
 desc "Download Webapp war file"
@@ -89,7 +81,6 @@ task :download do
  end
  puts "\n"
 end
-
 
 
  desc "Backup current release (dependant on webapp:download)"
@@ -125,10 +116,8 @@ end
 		puts "\n"
 	 end
 	 puts "\n"
-	end #end-task
+	end 
 
-
-# TO-DO: need to update path of tomcat
 
 desc "Deploy webapp to Tomcat"
 	task :deploy do
@@ -154,8 +143,6 @@ desc "Deploy webapp to Tomcat"
  		 end
  		 puts "\n"
  		end
-
-
 
 
 desc "Rollback to previous release"
@@ -192,7 +179,6 @@ desc "Rollback to previous release"
  	end
  end
 
-
 # use cleanup to remove any unwanted files
 
  desc "Cleanup activities (dependant on webapp:download)"
@@ -220,6 +206,5 @@ before 'webapp:download', 'webapp:pre_check'
 before 'webapp:download', 'webapp:varnish_check'
 before 'webapp:download', 'webapp:tomcat_check'
 after  'webapp:download', 'webapp:backup' 
-
 before 'webapp:deploy', 'webapp:download'
-after 'webapp:deploy', 'webapp:cleanup'
+after  'webapp:deploy', 'webapp:cleanup'
