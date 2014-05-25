@@ -1,6 +1,7 @@
 #TO-DO LIST:
 # varnish restart needs to be implemented after deployment
 # varnish check needs to be configued
+# updates roles to match model, prod etc.
 
 namespace :webapp do
 
@@ -36,10 +37,25 @@ desc "Check varnish status and restart if not running"
 task :varnish_check do
 	make_task_title_pretty "VARNISH CHECK"
 	on roles(:web), in: :sequence do |host|
-		puts "#{$checkmark} Varnish: running on #{get_hostname}"
+		if varnish_status.include? 'pid'
+			puts "#{$checkmark} Varnish: running on #{get_hostname}"
+		else
+			restart_varnish_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
+		end
 	end
 	puts "\n"
 end
+
+desc "Restart webapp varnish servers"
+	task :varnish_restart do
+		make_task_title_pretty "VARNISH RESTART"
+		on roles(:web), in: :sequence do |host|
+			restart_varnish_on get_hostname, "+ Attempting to restart Varnish.."
+		end
+	end 
+
+
+
 
 
 desc "Check tomcat status and restart if not running"
@@ -131,6 +147,7 @@ desc "Deploy webapp to Tomcat"
  			puts "+ Deploying files on #{get_hostname}.."
  			 # copy new war file from to tomcat webapp dir and restart tomcat
  			 if test("cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war")	
+ 			 	puts "#{checkmark} files deployed" 
  		  	restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
  		  	puts "#{$checkmark} Deployment successful"
  		 	else
@@ -157,7 +174,7 @@ desc "Rollback to previous release"
 	 if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
 		puts "#{$checkmark} Removed existing war file in prepapration for rollback"
 		
-		puts "Rolling back to: #{previous_release}.."
+		puts "+ Rolling back to: #{previous_release}.."
 		
 		# copy the previous release from backup dir to the tomcat webapps dir and restart tomcat
 		if test("sudo cp -rp /mnt/backup/#{previous_release}/ROOT* /opt/tomcat/webapps/")
@@ -184,14 +201,14 @@ desc "Rollback to previous release"
  desc "Cleanup activities (dependant on webapp:download)"
 task :cleanup do
 	make_task_title_pretty "CLEAN UP"
+	puts "+ Removing downloaded files.."
 	on roles(:app), in: :sequence do |host|
-   puts "+ Removing downloaded files.."
    if test("sudo rm /var/tmp/#{get_warfile_name_from ENV['URL']}")
-   	puts "#{$checkmark} #{get_warfile_name_from ENV['URL']} removed"
+   	puts "#{$checkmark} #{get_warfile_name_from ENV['URL']} removed on #{get_hostname} "
    else
    	error = capture "sudo rm /var/tmp/#{get_warfile_name_from ENV['URL']}"
    	display error
-   	puts "#{$warning} Unable to remove file. Please perform this action manually."
+   	puts "#{$warning} Unable to remove file on #{get_hostname}. Please perform this action manually."
    end
   end
 end
@@ -206,5 +223,6 @@ before 'webapp:download', 'webapp:pre_check'
 before 'webapp:download', 'webapp:varnish_check'
 before 'webapp:download', 'webapp:tomcat_check'
 after  'webapp:download', 'webapp:backup' 
-before 'webapp:deploy', 'webapp:download'
-after  'webapp:deploy', 'webapp:cleanup'
+before 'webapp:deploy'  , 'webapp:download'
+after  'webapp:deploy'  , 'webapp:varnish_restart' 
+after  'webapp:deploy'  , 'webapp:cleanup'

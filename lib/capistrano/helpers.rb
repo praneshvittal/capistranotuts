@@ -81,17 +81,22 @@ end
 
 
 def restart_varnish_on hostname, message
-	puts message 
-	execute "sudo service httpd stop" 
-	if test("sudo service httpd start")
-		puts "#{$checkmark} Varnish: running on  #{hostname}"
+  puts message 
+
+  # stop/start tomcat as owner
+
+	execute "sudo /etc/init.d/varnish restart"
+
+	if varnish_status.include? 'pid'
+		puts "#{$checkmark} Varnish: running on #{hostname}"
 	else
-		# showing failure
-		error = capture "sudo service httpd start", raise_on_non_zero_exit: false # setting exit to false to stop script from terminating
-		display error
-		puts "#{$cross} Restart failed on #{hostname} with non-zero exit status. Aborting.."
-		exit
+		puts "#{$cross} Restart failed. Please re-start Varnish manually on #{hostname}"
 	end
+end
+
+
+def varnish_status 
+	capture "sudo /etc/init.d/varnish status"
 end
 
 
