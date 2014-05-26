@@ -10,8 +10,8 @@ namespace :webapp do
 set :datestamp,  Time.now.strftime("%Y-%m-%d")
 
 # Unicode for status symbols
-$checkmark =  "\u2714"
-$cross     =  "\u2718"
+$checkmark =  "\u2713"
+$cross     =  "\u02Df"
 $warning   =  "\u26A0"
 $lines     =  "\u2630"
 
