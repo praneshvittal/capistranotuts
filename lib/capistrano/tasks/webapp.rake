@@ -52,10 +52,8 @@ desc "Restart webapp varnish servers"
 		on roles(:web), in: :sequence do |host|
 			restart_varnish_on get_hostname, "+ Attempting to restart Varnish.."
 		end
+		puts "\n"
 	end 
-
-
-
 
 
 desc "Check tomcat status and restart if not running"
@@ -147,7 +145,7 @@ desc "Deploy webapp to Tomcat"
  			puts "+ Deploying files on #{get_hostname}.."
  			 # copy new war file from to tomcat webapp dir and restart tomcat
  			 if test("cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war")	
- 			 	puts "#{checkmark} files deployed" 
+ 			 	puts "#{$checkmark} files deployed" 
  		  	restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
  		  	puts "#{$checkmark} Deployment successful"
  		 	else
@@ -167,8 +165,10 @@ desc "Rollback to previous release"
   make_task_title_pretty "ROLLBACK"
  	on roles(:app), in: :sequence do |host|
  	 puts "+ Attempting rollback on #{get_hostname}.."
- 	 backups = capture("ls /mnt/backup") # get backup dir name
- 	 previous_release = find_latest_from backups # 'latest' from backup dir is the previous release
+ 	 # get backup dir name
+ 	 backups = capture("ls /mnt/backup") 
+ 	 # 'latest' from backup dir is the previous release
+ 	 previous_release = find_latest_from backups 
 	 
 	 # remove existing ROOT* from tomcat webapps dir 
 	 if test("sudo rm -rf /opt/tomcat/webapps/ROOT*")
@@ -226,3 +226,8 @@ after  'webapp:download', 'webapp:backup'
 before 'webapp:deploy'  , 'webapp:download'
 after  'webapp:deploy'  , 'webapp:varnish_restart' 
 after  'webapp:deploy'  , 'webapp:cleanup'
+
+
+# webapp:rollback workflow #
+
+after 'webapp:rollback', 'webapp:varnish_restart'
