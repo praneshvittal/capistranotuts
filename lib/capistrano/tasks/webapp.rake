@@ -18,9 +18,10 @@ $lines     =  "\u2630"
 # Not used in deployment flow however useful for testing
 desc "Test ssh connection"
   task :test_connection do
-  	on roles(:web), in: :sequence do |host|
-  		hostname =capture "hostname"
+  	on roles(:webapp_tomcat), in: :sequence do |host|
+  		hostname = capture "hostname"
   		puts hostname
+			puts get_version_info_from "/opt/tomcat/webapps/ROOT/META-INF/MANIFEST.MF", 'Build-Time'
   	end
 	end
 
@@ -29,17 +30,18 @@ desc "Checks if command line arguments are present before running webapp:downloa
  	args = ['URL', 'UN', 'PW', 'TCR']
 
   # Check if the ENV global variable has command-line arguments URL,UN etc.
-  args_empty?(args) 
+  puts args_empty?(args) 
  end
 
 desc "Check varnish status and restart if not running"
 task :varnish_check do
-	make_task_title_pretty "VARNISH CHECK"
-	on roles(:web), in: :sequence do |host|
+	puts make_task_title_pretty "VARNISH CHECK"
+	on roles(:varnish_cache_webapp), in: :sequence do |host|
+		execute "hostname" 	
 		if varnish_status.include? 'pid'
 			puts "#{$checkmark} Varnish: running on #{get_hostname}"
 		else
-			restart_varnish_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
+			puts restart_varnish_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
 		end
 	end
 	puts "\n"
@@ -48,9 +50,9 @@ end
 # Restart all varnish servers once app is deployed
 desc "Restart webapp varnish servers"
 	task :varnish_restart do
-		make_task_title_pretty "VARNISH RESTART"
-		on roles(:web), in: :sequence do |host|
-			restart_varnish_on get_hostname, "+ Attempting to restart Varnish.."
+		puts make_task_title_pretty "VARNISH RESTART"
+		on roles(:varnish_cache_webapp), in: :sequence do |host|
+			puts restart_varnish_on get_hostname, "+ Attempting to restart Varnish.."
 		end
 		puts "\n"
 	end 
@@ -58,15 +60,15 @@ desc "Restart webapp varnish servers"
 
 desc "Check tomcat status and restart if not running"
 task :tomcat_check do
-	make_task_title_pretty "TOMCAT CHECK"
-	on roles(:web), in: :sequence do |host|
+	puts make_task_title_pretty "TOMCAT CHECK"
+	on roles(:webapp_tomcat), in: :sequence do |host|
 		# The tomcat_status function returns the result of service tomcat status.
 		# If tomcat is running 'running with pid..' is returned
 		if tomcat_status.include? 'pid'
 			puts "#{$checkmark} Tomcat: running on #{get_hostname}"
 		else
 			# Attempt to restart tomcat if not running
-			restart_tomcat_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
+			puts restart_tomcat_on get_hostname, "+ Service is not running on #{get_hostname}. Attempting to restart.."
 		end
 	end
 	puts "\n"
@@ -75,33 +77,43 @@ end
 
 desc "Download Webapp war file"
 task :download do
-	make_task_title_pretty "DOWNLOAD APP"
+	puts make_task_title_pretty "DOWNLOAD APP"
   warfile_name = get_warfile_name_from ENV['URL']
 
-	on roles(:app), in: :sequence do |host|
+	on roles(:webapp_tomcat), in: :sequence do |host|
 	# If file exists prompt user to confirm if re-download required
   if test("ls /var/tmp/#{warfile_name}")
   	puts "#{$warning} File already exists on #{get_hostname}"
   	ask :input, "Download file again? [y/n]"
   	if 'yY'.include? fetch(:input)
- 		 download_warfile_from get_hostname, warfile_name
+ 		 puts download_warfile_from get_hostname, warfile_name
   	else
   		puts "#{$checkmark} Using existing file - Nothing to do."
   	end
   else
   	# Download since file doesn't exist
-	  download_warfile_from get_hostname, warfile_name
+	  puts download_warfile_from get_hostname, warfile_name
 	end
 	puts "\n"
  end
  puts "\n"
 end
 
+ desc "prints the environment variables"
+	task :print_env do
+		on roles(:webapp_tomcat), in: :sequence do |host|
+			puts "ENV['TCR'] is #{ENV['TCR']}"
+			puts "time stamp is #{fetch(:datestamp)}"
+		end
+ 	end
+	
+
+
 
  desc "Backup current release (dependant on webapp:download)"
 	task :backup do
-		make_task_title_pretty "BACKUP CURRENT RELEASE"
-		on roles(:app), in: :sequence do |host|
+		puts make_task_title_pretty "BACKUP CURRENT RELEASE"
+		on roles(:webapp_tomcat), in: :sequence do |host|
 
 		puts "+ Starting backup process on #{get_hostname}.."
 
@@ -136,8 +148,8 @@ end
 
 desc "Deploy webapp to Tomcat"
 	task :deploy do
-		make_task_title_pretty "DEPLOY APP"
- 		on roles(:app), in: :sequence do |host|
+		puts make_task_title_pretty "DEPLOY APP"
+ 		on roles(:webapp_tomcat), in: :sequence do |host|
 
  			# Remove existing ROOT* from tomcat webapps dir
  			if test("ls /opt/tomcat/webapps/ROOT* && sudo rm -rf /opt/tomcat/webapps/ROOT*")
@@ -145,12 +157,13 @@ desc "Deploy webapp to Tomcat"
 			end
  			puts "+ Deploying files on #{get_hostname}.."
  			 # Copy new war file from /var/tmp to tomcat webapp dir and restart tomcat
- 			 if test("cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war")	
+ 			 if test("sudo cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war")	
  			 	puts "#{$checkmark} files deployed" 
- 		  	restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
+ 		  	puts restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
  		  	puts "#{$checkmark} Deployment successful"
+ 		  	puts get_version_info_from "/opt/tomcat/webapps/ROOT/META-INF/MANIFEST.MF", 'Build-Time'
  		 	else
- 		 		error = capture "cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war"
+ 		 		error = capture " sudo cp /var/tmp/#{get_warfile_name_from ENV['URL']} /opt/tomcat/webapps/ROOT.war"
 				display error
 				puts "#{$cross} Deployment failed..Aborting"
 				exit
@@ -163,11 +176,13 @@ desc "Deploy webapp to Tomcat"
 
 desc "Rollback to previous release"
  task :rollback do
-  make_task_title_pretty "ROLLBACK"
- 	on roles(:app), in: :sequence do |host|
+  puts make_task_title_pretty "ROLLBACK"
+ 	on roles(:webapp_tomcat), in: :sequence do |host|
  	 puts "+ Attempting rollback on #{get_hostname}.."
+ 	 
  	 # Get backup dir name
- 	 backups = capture("ls /mnt/backup") 
+ 	 backups = capture("ls /mnt/backup | awk '{print $1}'") 
+ 	 
  	 # 'latest' from backup dir is the previous release
  	 previous_release = find_latest_from backups 
 	 
@@ -180,8 +195,9 @@ desc "Rollback to previous release"
 		# Copy the previous release from backup dir to the tomcat webapps dir and restart tomcat
 		if test("sudo cp -rp /mnt/backup/#{previous_release}/ROOT* /opt/tomcat/webapps/")
 			puts "#{$checkmark} Files from #{previous_release} deployed"
- 	 		restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
- 	 		puts "#{$checkmark} Rollback successful"	
+ 	 		puts restart_tomcat_on get_hostname, "+ Attempting to restart Tomcat.."
+ 	 		puts "#{$checkmark} Rollback successful"
+ 	 		puts get_version_info_from "/opt/tomcat/webapps/ROOT/META-INF/MANIFEST.MF", 'Build-Time'
  	 	else
  	 		# If rollback to tomcat webapp dir fails exit script
  	 		puts "#{$cross} Rollback failed"
@@ -200,9 +216,9 @@ desc "Rollback to previous release"
 # Cleanup taks for any house keeping activities
  desc "Cleanup activities (dependant on webapp:download)"
 task :cleanup do
-	make_task_title_pretty "CLEAN UP"
+	puts make_task_title_pretty "CLEAN UP"
 	puts "+ Removing downloaded files.."
-	on roles(:app), in: :sequence do |host|
+	on roles(:webapp_tomcat), in: :sequence do |host|
    if test("sudo rm /var/tmp/#{get_warfile_name_from ENV['URL']}")
    	puts "#{$checkmark} #{get_warfile_name_from ENV['URL']} removed on #{get_hostname} "
    else
@@ -213,9 +229,7 @@ task :cleanup do
   end
 end
 
-
 end # webapp namespace end
-
 
 # webapp:deploy workflow #
 
@@ -226,7 +240,6 @@ after  'webapp:download', 'webapp:backup'
 before 'webapp:deploy'  , 'webapp:download'
 after  'webapp:deploy'  , 'webapp:varnish_restart' 
 after  'webapp:deploy'  , 'webapp:cleanup'
-
 
 # webapp:rollback workflow #
 
