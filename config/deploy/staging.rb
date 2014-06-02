@@ -20,8 +20,8 @@ set :stage, 'staging'
 # server list. The second argument is a, or duck-types, Hash and is
 # used to set extended properties on the server.
 
-#server '192.168.33.10', user: 'vagrant', roles: %w{web app db}
-server '192.168.33.11', user: 'vagrant', roles: %w{web app}
+server '192.168.33.10', user: 'vagrant', roles: %w{webapp_tomcat varnish_cache_webapp}
+server '192.168.33.11', user: 'vagrant', roles: %w{webapp_tomcat varnish_cache_webapp}
 
 
 # Custom SSH Options
