@@ -19,7 +19,7 @@ set :deploy_to, '/home/vagrant/railsdemo'
 # set :format, :pretty
 
 # Default value for :log_level is :debug, fa
-set :log_level, :info
+set :log_level, :ERROR
 
 
 #     TRACE = -1
