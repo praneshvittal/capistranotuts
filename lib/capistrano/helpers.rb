@@ -3,19 +3,19 @@ require 'uri'
 def args_empty? args
 	count = 0
 	args.each do |key|
-		# check if the ENV arguments exist
+		# Check if the ENV arguments exist
 		if ENV[key].nil?
-			puts "#{$warning} Missing argument: #{key}"
+			"#{$warning} Missing argument: #{key}"
 			count = count + 1
 		else
-			# check if the ENV values are empty
+			# Check if the ENV values are empty
 			if ENV[key].empty?
 				count = count + 1
 			end
 		end
 	end
  if count > 0
- 	puts "Run like cap staging task-name-space:task-name URL=path-to-file UN=username PW=password TCR=TCR#"
+ 	"Run like cap staging task-name-space:task-name URL=path-to-file UN=username PW=password TCR=TCR#"
  	exit
  end
 end
@@ -31,9 +31,9 @@ def download_warfile_from hostname, warfile_name
 	puts '+ Downloading app..(May take a while depending on the file size)'
 	execute "wget --user=#{ENV['UN']} --password=#{ENV['PW']} #{ENV['URL']} -O /var/tmp/#{warfile_name}"
 	if test("ls /var/tmp/#{warfile_name}")
-	   puts "#{$checkmark} Downloaded #{warfile_name} on #{hostname}"
+	   "#{$checkmark} Downloaded #{warfile_name} on #{hostname}"
 	 else
-	   puts "#{$cross} Cannot find #{warfile_name} in home dir. Aborting.."
+	   "#{$cross} Cannot find #{warfile_name} in home dir. Aborting.."
 	   exit 
 	 end
 end
@@ -49,9 +49,9 @@ def restart_tomcat_on hostname, message
 	execute "sudo /etc/init.d/tomcat start"
 
 	if tomcat_status.include? 'pid'
-		puts "#{$checkmark} Tomcat: running on #{hostname}"
+		"#{$checkmark} Tomcat: running on #{hostname}"
 	else
-		puts "#{$cross} Restart failed on #{hostname}. Aborting.."
+		"#{$cross} Restart failed on #{hostname}. Aborting.."
 		exit
 	end
 end
@@ -85,18 +85,21 @@ def restart_varnish_on hostname, message
 
   # stop/start tomcat as owner
 
-	execute "sudo /etc/init.d/varnish restart"
+	execute "sudo /etc/init.d/varnish stop"
+	execute "sudo /etc/init.d/varnish start"
 
 	if varnish_status.include? 'pid'
-		puts "#{$checkmark} Varnish: running on #{hostname}"
+		"#{$checkmark} Varnish: running on #{hostname}"
 	else
-		puts "#{$cross} Restart failed. Please re-start Varnish manually on #{hostname}"
+		"#{$cross} Restart failed. Please re-start Varnish manually on #{hostname}"
 	end
 end
 
 
 def varnish_status 
-	capture "sudo /etc/init.d/varnish status"
+	# when you check the status of varnish, it returns error code 3 when it is stopped. 
+	# turning off error exit code to make capture pass.
+	capture "sudo /etc/init.d/varnish status", raise_on_non_zero_exit: false 
 end
 
 
@@ -112,9 +115,31 @@ def get_hostname
 	capture('hostname')
 end
 
-def make_task_title_pretty task_name
-	puts "#{$lines} #{$lines}   #{task_name}   #{$lines} #{$lines}"
+def get_version_info_from path, search_string
+	  			
+	# chck if file exists
+	if test("ls #{path}")
+		# get build info
+		if test("grep 'Build-Time' #{path}")
+			"+ Deployment info: \n #{$checkmark} #{capture "grep #{search_string} #{path}"}" 
+		else
+		  "#{$warning} Cannot retrieve deployment info: \n#{$cross} Unable to find \'#{search_string}\' in #{path}"
+		end		
+	else
+		  "#{$warning} Cannot retrieve deployment info: \n#{$cross} Unable to find file: #{path}"
+	end
 end
+
+
+
+
+
+def make_task_title_pretty task_name
+	"#{$lines} #{$lines}   #{task_name}   #{$lines} #{$lines}"
+end
+
+
+
 
 
 
