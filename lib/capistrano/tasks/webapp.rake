@@ -3,6 +3,8 @@
 # varnish check needs to be configued
 # updates roles to match model, prod etc.
 
+import 'lib/capistrano/helpers.rb'
+
 namespace :webapp do
 
 
