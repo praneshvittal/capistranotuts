@@ -130,17 +130,294 @@ You define the **namespace** `db`. Within the namespace we define **tasks**. In 
 If it's still not hitting the spot, think of **roles** as **groups**. Your servers will belong to one or more groups and **tasks** are run on these groups.
 
 
-We will look at tasks in more detail next. 
+
+#### What's in the lib/capistrano/tasks directory?  ####
+
+As the name implies, this is where you create your task files.
+
+
+We will look at tasks in more detail next along with some other Capistrano nuggets.
 
 
 ## Doing Something with Capistrano ##
 
+### Controlling Capistrano output  ###
 
-(coming soon!)
+Capistrano provides various levels of output. Usually when first writing your tasks it is a good idea to set the log level to `info` or `debug` to see verbose output of the execution flow. When you're confident it is behaving as expected you can replace the log level with `error` and use custom output.
+
+Capistrano output types:
+
+```ruby
+   TRACE = -1
+   DEBUG = 0
+   INFO  = 1
+   WARN  = 2
+   ERROR = 3
+   FATAL = 4
+```
+
+This is usually set within `config/deploy.rb`:
+
+```ruby
+# Default value for :log_level is :debug
+set :log_level, :ERROR
+```
+
+By turning off log output, you can use ruby `put` statements inside your task to give customized output.
+
+
+### Using Capistrano variables  ###
+
+You can define a regular ruby variable or do it via the capistrano DSL like so:
+
+```ruby
+# Defining the variable
+set :datestamp,  Time.now.strftime("%Y-%m-%d")
+
+# Using variable
+puts "The date is: #{fetch(:datestamp)}"
+```
+
+`fetch(:variable_name)` is part of the Capistrano DSL. The rest of it is ruby [string interpolation](http://en.wikipedia.org/wiki/String_interpolation#Ruby).
 
 
 
+###  Executing commands ###
+
+Simply execute commands on the remote server by doing:
+
+```ruby
+execute "sudo mkdir /mnt/backup"
+```
+
+
+### Capturing output  ###
+
+Use the `capture` command to get output from remote host: 
+
+```ruby
+# Returns the hostname of the server which is stored in a variable
+hostname = capture 'hostname'
+
+# Prints hostname to standard output
+puts hostname
+```
+
+
+### Getting input from a user ###
+
+With Capistrano you can also prompt users for input:
+
+```ruby
+ask :input, "Download file again? [y/n]"
+
+# show the user input
+puts "#{fetch(:input)}"
+```
+
+`ask` is a method that takes 2 arguments. One is the variable that you store the user input and the other is the text to display.
+
+
+### Using Capistrano with Ruby  ###
+
+To keep your code DRY it is a good idea to extract code into functions.
+
+Here is an arbitary example to show you what you can do:
+
+```ruby
+
+# lib/capistrano/helpers.rb
+
+def get_hostname
+ capture 'hostname'
+end
+
+# lib/capistrano/tasks/file.rake
+
+import  'lib/capistrano/helpers.rb'
+
+desc 'check if file exists'
+ task :cat_file do
+  on roles(:app), in: :sequence do |host|
+   puts get_hostname # calling the function in helpers.rb
+   execute 'cat sample.txt'
+ end
+end
+```
 
 
 
+### Defining a task  ###
 
+Tasks can loosely be broken down into 3 parts.
+
++ First, we give it a description so that when we run  `cap -T` it will display the task name along with a description
++ Next we specify a `role` to run the task on as discussed before
++ Lastly,  we take action by executing commands, performing some logic etc.
+
+
+#### Here are some simple examples  #####
+
+
+Running a task in parallel:
+
+
+```ruby 
+desc "Get hostname"
+ task :get_hostname do
+  on roles(:webapp) do |host|
+   execute 'hostname'
+   execute 'ls -l'
+  end
+ end
+
+ ```
+
+ The above task will first execute the hostname command on all servers and subsequently execute the list command.
+
+
+ To run a task in sequence:
+
+```ruby 
+desc "Get hostname"
+ task :get_hostname do
+  on roles(:webapp), in: :sequence do |host|
+   execute 'hostname'
+   execute 'ls -l'
+  end
+ end
+
+ ```
+
+ Now it will run the commands sequencially on each host before moving onto the next host.
+
+Something to always remember is the native ruby blocks in use. Everytime you use `do` it needs to have an `end` to terminate the block.
+
+
+### Tasks Demystified  ###
+
+
+Here is a task that downloads a war file. This may seem daunting at first but I will dissect it from star to finish.
+
+```ruby
+desc "Download Webapp war file"
+task :download do
+	puts make_task_title_pretty "DOWNLOAD APP"
+    warfile_name = get_warfile_name_from ENV['URL']
+
+	on roles(:webapp_tomcat), in: :sequence do |host|
+	# If file exists prompt user to confirm if re-download required
+  if test("ls /var/tmp/#{warfile_name}")
+  	puts "#{$warning} File already exists on #{get_hostname}"
+  	ask :input, "Download file again? [y/n]"
+  	if 'yY'.include? fetch(:input)
+ 		 puts download_warfile_from get_hostname, warfile_name
+  	else
+  		puts "#{$checkmark} Using existing file - Nothing to do."
+  	end
+  else
+  	# Download since file doesn't exist
+	  puts download_warfile_from get_hostname, warfile_name
+	end
+	puts "\n"
+ end
+ puts "\n"
+end
+
+```
+
+
+Lets break this down.
+
+```ruby
+desc "Download Webapp war file"
+task :download do
+```
+
+This should be self explantory already. If its not clear, read the previous section.
+
+
+```ruby
+puts make_task_title_pretty "DOWNLOAD APP"
+```
+
+Now I'm swiching to ruby to make the title pretty. Basically calling a function `make_task_title_pretty` that will return "DOWNLOAD APP" with some formatting.
+
+lets move on.
+
+```ruby
+warfile_name = get_warfile_name_from ENV['URL']
+```
+
+only difference here is I am using `ENV['URL']` to access the argument provided in the Capistrano command. This will be clear with an example:
+
+```ruby
+cap staging webapp:download URL='http://yamininaidu.com.au/wp/wp-content/uploads/2014/02/classic-batman-logo.jpg'
+```
+
+If it hasn't sunk in yet, `ENV['URL']` gives me access to the value of `URL` passed as an argument in the cap command. Simple right?
+
+Just like before I call the ruby function to get the file name from the url with `get_warfile_name_from` and store it in a variable for later use.
+
+next.
+
+```ruby
+on roles(:webapp_tomcat), in: :sequence do |host|
+```
+
+We've discussed the above already.
+
+
+Now comes the logic and something I haven't introduced yet.
+
+```ruby
+if test("ls /var/tmp/#{warfile_name}")
+  	puts "#{$warning} File already exists on #{get_hostname}"
+  	ask :input, "Download file again? [y/n]"
+  	if 'yY'.include? fetch(:input)
+ 		 puts download_warfile_from get_hostname, warfile_name
+  	else
+  		puts "#{$checkmark} Using existing file - Nothing to do."
+  	end
+  else
+  	# Download since file doesn't exist
+	  puts download_warfile_from get_hostname, warfile_name
+	end
+```
+
+Capistrano by nature will terminate if a command fails for whatever reason. This is because it looks at the `exit` code and anything other than `0` is considered to be failure.
+
+You can override this behavior with:
+
+```ruby
+# always set the return code to true
+execute "ls /var/tmp/sample.txt;", raise_on_non_zero_exit: false
+```
+
+So even if `sample.txt` doesn't exist, Capistrano won't terminate. However, this is risky because in most cases you either want it to terminate or do something else if it fails. This is where `if test()` triumphs.
+
+This means you can use `if else` logic with unix commands inside `test()`
+
+Back to the main code block, It checks if the war file exists and prompts the user to download again else download the file.
+
+Lets keep breaking it down:
+
+```ruby
+puts "#{$warning} File already exists on #{get_hostname}"
+```
+
+`$warning` is a ruby global variable defined with a unicode symbol for some visual appeal. As you know by now, `get_hostname` is another method.
+
+
+```ruby
+	ask :input, "Download file again? [y/n]"
+  	if 'yY'.include? fetch(:input)
+ 		 puts download_warfile_from get_hostname, warfile_name
+  	else
+  		puts "#{$checkmark} Using existing file - Nothing to do."
+  	end
+```
+
+we get the input with the `ask` method and check if user accept or declines.
+
+Thats all for now!
