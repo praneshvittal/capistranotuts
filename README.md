@@ -163,7 +163,7 @@ This is usually set within `config/deploy.rb`:
 set :log_level, :ERROR
 ```
 
-By turning off log output, you can use ruby `put` statements inside your task to give customized output.
+By minimizing log output, you can use ruby `put` statements inside your task to give customized output.
 
 
 ### Using Capistrano variables  ###
@@ -206,7 +206,7 @@ puts hostname
 
 ### Getting input from a user ###
 
-With Capistrano you can also prompt users for input:
+You can also prompt users for input:
 
 ```ruby
 ask :input, "Download file again? [y/n]"
@@ -215,14 +215,14 @@ ask :input, "Download file again? [y/n]"
 puts "#{fetch(:input)}"
 ```
 
-`ask` is a method that takes 2 arguments. One is the variable that you store the user input and the other is the text to display.
+`ask` is a method that can take 2 arguments. One is the variable that you store the user input and the other is the text to display.
 
 
 ### Using Capistrano with Ruby  ###
 
 To keep your code DRY it is a good idea to extract code into functions.
 
-Here is an arbitary example to show you what you can do:
+Here is an arbitary example to show you what can be done:
 
 ```ruby
 
@@ -251,7 +251,7 @@ end
 
 Tasks can loosely be broken down into 3 parts.
 
-+ First, we give it a description so that when we run  `cap -T` it will display the task name along with a description
++ First, we give it a description and a task name so that when we run  `cap -T` it will display the task name along with a description
 + Next we specify a `role` to run the task on as discussed before
 + Lastly,  we take action by executing commands, performing some logic etc.
 
@@ -273,7 +273,7 @@ desc "Get hostname"
 
  ```
 
- The above task will first execute the hostname command on all servers and subsequently execute the list command.
+ The above task will first execute the hostname command on all servers first and subsequently execute the list command.
 
 
  To run a task in sequence:
@@ -334,14 +334,14 @@ desc "Download Webapp war file"
 task :download do
 ```
 
-This should be self explantory already. If its not clear, read the previous section.
+Here we provide a description and name the task. We also start our first `do` block which will be terminated with `end`.
 
 
 ```ruby
 puts make_task_title_pretty "DOWNLOAD APP"
 ```
 
-Now I'm swiching to ruby to make the title pretty. Basically calling a function `make_task_title_pretty` that will return "DOWNLOAD APP" with some formatting.
+Now we swiching to ruby to make the title pretty. Basically calling a function `make_task_title_pretty` that will return "DOWNLOAD APP" with some formatting.
 
 lets move on.
 
@@ -365,7 +365,7 @@ next.
 on roles(:webapp_tomcat), in: :sequence do |host|
 ```
 
-We've discussed the above already.
+We specify which role(s) we are going to run this task on. We also want the commands to be executed sequencially on each host.
 
 
 Now comes the logic and something I haven't introduced yet.
@@ -394,11 +394,11 @@ You can override this behavior with:
 execute "ls /var/tmp/sample.txt;", raise_on_non_zero_exit: false
 ```
 
-So even if `sample.txt` doesn't exist, Capistrano won't terminate. However, this is risky because in most cases you either want it to terminate or do something else if it fails. This is where `if test()` triumphs.
+So even if `sample.txt` doesn't exist, Capistrano won't terminate with an error. However, this is risky because in most cases you either want it to terminate or do something else if it fails. This is where `if test()` triumphs.
 
-This means you can use `if else` logic with unix commands inside `test()`
+This means you can use `if else` logic with unix commands inside `test()..`
 
-Back to the main code block, It checks if the war file exists and prompts the user to download again else download the file.
+Back to the main code block, It checks if the war file exists and prompts the user to download again otherwise just download the file.
 
 Lets keep breaking it down:
 
@@ -419,5 +419,3 @@ puts "#{$warning} File already exists on #{get_hostname}"
 ```
 
 we get the input with the `ask` method and check if user accept or declines.
-
-Thats all for now!
