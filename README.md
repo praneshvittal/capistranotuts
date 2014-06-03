@@ -3,10 +3,11 @@
 
 Introduction to Capistrano 3. 
 
-Note: The approach in this tutorial is from a non-deployment perspective. What this means is I am not delving into 'how to deploy' rather
-nuggets of information on Capistrano features.
+Note: 
+The approach in this tutorial is from a non-deployment perspective (at the moment anyway). What this means is I am not delving into 'how to deploy' rather nuggets of information on Capistrano features.
 
-#### Disclaimer: #### The information captured here is to the best of my knowledge. If information is inaccurate please let me know.
+Disclaimer: 
+The information captured here is to the best of my knowledge. If information is inaccurate please let me know.
 
 ## Setting It All Up  ##
 
