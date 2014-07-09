@@ -345,7 +345,7 @@ Here we provide a description and name the task. We also start our first `do` bl
 puts make_task_title_pretty "DOWNLOAD APP"
 ```
 
-Now we swiching to ruby to make the title pretty. Basically calling a function `make_task_title_pretty` that will return "DOWNLOAD APP" with some formatting.
+Now we are swiching to ruby to make the title pretty. Basically calling a function `make_task_title_pretty` that will return "DOWNLOAD APP" with some formatting.
 
 lets move on.
 
