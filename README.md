@@ -301,7 +301,7 @@ Something to always remember is the native ruby blocks in use. Everytime you use
 ### Tasks Demystified  ###
 
 
-Here is a task that downloads a war file. This may seem daunting at first but I will dissect it from star to finish.
+Here is a task that downloads a war file. This may seem daunting at first but I will dissect it from start to finish.
 
 ```ruby
 desc "Download Webapp war file"
