@@ -25,8 +25,10 @@ Or you can do:
 `gem install capistrano`
 
 Once Capistrano is installed, you need to setup the Capistrano project:
-`cd /path/to/project`
-`cap install`
+```
+cd /path/to/project
+cap install
+```
 
 
 ### Updating capistrano ###
@@ -56,7 +58,7 @@ To update Capistrano via your Gemfile do:
 
 #### What's a Capfile?  ####
 
-`Capfile` is the main configuration file Capistrano needs. This loaded by default. You'd rarely have the need to modify this.
+`Capfile` is the main configuration file Capistrano needs. This is loaded by default. You'd rarely have the need to modify this.
 
 
 #### What's config/debloy.rb?   ####
